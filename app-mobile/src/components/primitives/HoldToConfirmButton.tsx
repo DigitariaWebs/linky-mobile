@@ -1,0 +1,97 @@
+import { Pressable, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  cancelAnimation,
+  runOnJS,
+  useAnimatedReaction,
+} from 'react-native-reanimated';
+import { useTheme } from '../../theme/ThemeProvider';
+import { Text } from './Text';
+import { haptic } from '../../lib/haptics';
+import { I } from '../../icons/Icon';
+
+const HOLD_MS = 800;
+
+export function HoldToConfirmButton({
+  label = 'Maintiens pour confirmer la réception',
+  onConfirm,
+  disabled,
+}: {
+  label?: string;
+  onConfirm: () => void;
+  disabled?: boolean;
+}) {
+  const { colors } = useTheme();
+  const progress = useSharedValue(0);
+
+  useAnimatedReaction(
+    () => progress.value,
+    (val, prev) => {
+      if (val >= 1 && (prev ?? 0) < 1) {
+        runOnJS(haptic.success)();
+        runOnJS(onConfirm)();
+      }
+    },
+  );
+
+  const fill = useAnimatedStyle(() => ({
+    width: `${progress.value * 100}%`,
+  }));
+
+  const start = () => {
+    if (disabled) return;
+    haptic.light();
+    progress.value = withTiming(1, { duration: HOLD_MS });
+  };
+  const cancel = () => {
+    cancelAnimation(progress);
+    if (progress.value < 1) {
+      progress.value = withTiming(0, { duration: 200 });
+    }
+  };
+
+  return (
+    <Pressable
+      onPressIn={start}
+      onPressOut={cancel}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={{
+        width: '100%',
+        height: 56,
+        borderRadius: 999,
+        backgroundColor: colors.primary,
+        overflow: 'hidden',
+        opacity: disabled ? 0.5 : 1,
+      }}
+    >
+      <Animated.View
+        style={[
+          {
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            backgroundColor: colors.primaryDeep,
+          },
+          fill,
+        ]}
+      />
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+        }}
+      >
+        <I.check size={18} color="#FFFFFF" />
+        <Text style={{ color: '#FFFFFF', fontWeight: '600', fontSize: 15 }}>{label}</Text>
+      </View>
+    </Pressable>
+  );
+}

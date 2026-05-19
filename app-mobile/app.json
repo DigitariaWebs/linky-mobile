@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "Linky",
+    "slug": "linky",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "linky",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.linky.app",
+      "icon": {
+        "light": "./assets/images/icon.png",
+        "dark": "./assets/images/icon-dark.png",
+        "tinted": "./assets/images/icon.png"
+      },
+      "infoPlist": {
+        "NSCameraUsageDescription": "Linky a besoin de l'appareil photo pour scanner ta pièce d'identité et photographier tes annonces.",
+        "NSPhotoLibraryUsageDescription": "Linky a besoin d'accéder à tes photos pour les ajouter à tes annonces.",
+        "NSLocationWhenInUseUsageDescription": "Linky utilise ta position pour te montrer les annonces près de toi."
+      }
+    },
+    "android": {
+      "package": "com.linky.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#F7F3EC"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-secure-store",
+      "expo-video",
+      "expo-camera",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F0E0CF"
+        }
+      ],
+      "expo-maps"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": false
+    },
+    "extra": {
+      "eas": {
+        "projectId": "REPLACE_WITH_YOUR_EAS_PROJECT_ID"
+      }
+    }
+  }
+}

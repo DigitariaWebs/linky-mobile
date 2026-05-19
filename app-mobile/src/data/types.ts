@@ -1,0 +1,156 @@
+// Domain types shared between mock data and queries.
+// When swapping to a real API, these should match the OpenAPI schema.
+
+export type ID = string;
+
+export type Condition = 'neuf' | 'occasion' | 'reconditionné';
+export type ListingStatus = 'active' | 'reserved' | 'sold' | 'paused' | 'pending';
+export type PropertyType = 'location' | 'vente' | 'terrain';
+export type OrderStatus = 'placed' | 'paid' | 'preparing' | 'delivered' | 'released' | 'disputed';
+export type PaymentMethod = 'orange-money' | 'mtn-money' | 'card' | 'wallet';
+
+export interface User {
+  id: ID;
+  name: string;
+  photo: string;
+  city: string;
+  country: string;
+  kycVerified: boolean;
+  diaspora: boolean;
+  phone?: string;
+  email?: string;
+  rating: number;
+  roles: Array<'buyer' | 'seller' | 'agent'>;
+}
+
+export interface Shop {
+  id: ID;
+  ownerId: ID;
+  name: string;
+  cover: string;
+  avatar: string;
+  city: string;
+  verified: boolean;
+  rating: number;
+  reviewCount: number;
+  followerCount: number;
+  productCount: number;
+  responseTime: string;
+  about: string;
+}
+
+export interface Product {
+  id: ID;
+  shopId: ID;
+  title: string;
+  description: string;
+  priceGnf: number;
+  category: string;
+  condition: Condition;
+  status: ListingStatus;
+  photos: string[];
+  boosted: boolean;
+  viewCount: number;
+  favCount: number;
+  city: string;
+  district?: string;
+  createdAt: string;
+}
+
+export interface Property {
+  id: ID;
+  ownerId: ID;
+  shopId?: ID;
+  title: string;
+  description: string;
+  type: PropertyType;
+  priceGnf: number;
+  perMonth: boolean;
+  bedrooms?: number;
+  areaSqm?: number;
+  furnished?: boolean;
+  city: string;
+  district: string;
+  distanceToRoadMeters: number;
+  photos: string[];
+  videoUrl?: string;
+  status: ListingStatus;
+  badge?: 'Nouveau' | 'Réservé';
+  gps: { lat: number; lng: number };
+  createdAt: string;
+}
+
+export type DiscoverItem =
+  | { kind: 'product'; item: Product }
+  | { kind: 'property'; item: Property };
+
+export interface CartLine {
+  productId: ID;
+  quantity: number;
+}
+
+export interface Order {
+  id: ID;
+  reference: string;
+  buyerId: ID;
+  sellerId: ID;
+  shopId: ID;
+  productId: ID;
+  productSnapshot: { title: string; photo: string; priceGnf: number };
+  quantity: number;
+  amountGnf: number;
+  feesGnf: number;
+  totalGnf: number;
+  paymentMethod: PaymentMethod;
+  status: OrderStatus;
+  createdAt: string;
+  events: Array<{ at: string; label: string }>;
+  releaseAt?: string;
+}
+
+export interface WalletMovement {
+  id: ID;
+  direction: 'in' | 'out';
+  label: string;
+  amountGnf: number;
+  date: string;
+  status: 'received' | 'escrow' | 'completed' | 'pending';
+}
+
+export interface Wallet {
+  balanceGnf: number;
+  pendingGnf: number;
+  movements: WalletMovement[];
+}
+
+export interface Message {
+  id: ID;
+  conversationId: ID;
+  senderId: ID;
+  body: string;
+  at: string;
+  seen: boolean;
+}
+
+export interface Conversation {
+  id: ID;
+  participants: ID[];
+  otherUserId: ID;
+  pinnedListingId?: ID;
+  pinnedListingKind?: 'product' | 'property';
+  lastMessage: string;
+  lastAt: string;
+  unread: number;
+}
+
+export type NotificationCategory = 'order' | 'message' | 'promo' | 'system';
+
+export interface AppNotification {
+  id: ID;
+  category: NotificationCategory;
+  title: string;
+  body: string;
+  at: string;
+  read: boolean;
+  iconHint: string;
+}

@@ -1,0 +1,350 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Platform, Pressable, ScrollView, View } from 'react-native';
+import { AppleMaps, GoogleMaps } from 'expo-maps';
+import { Check, MapPin } from 'lucide-react-native';
+import { useTheme } from '../../theme/ThemeProvider';
+import { Text } from '../primitives/Text';
+import { haptic } from '../../lib/haptics';
+
+export interface GuineaCity {
+  name: string;
+  region: string;
+  lat: number;
+  lng: number;
+}
+
+const REGIONS = [
+  'Conakry',
+  'Boké',
+  'Kindia',
+  'Labé',
+  'Mamou',
+  'Faranah',
+  'Kankan',
+  'Nzérékoré',
+] as const;
+type Region = (typeof REGIONS)[number];
+
+// All 33 prefecture capitals of Guinea + Conakry, the 8 administrative regions
+// share their names with their capital cities.
+export const GUINEA_CITIES: GuineaCity[] = [
+  { name: 'Conakry', region: 'Conakry', lat: 9.6412, lng: -13.5784 },
+  { name: 'Boké', region: 'Boké', lat: 10.9333, lng: -14.3 },
+  { name: 'Boffa', region: 'Boké', lat: 10.1667, lng: -14.0333 },
+  { name: 'Fria', region: 'Boké', lat: 10.3667, lng: -13.5833 },
+  { name: 'Gaoual', region: 'Boké', lat: 11.7484, lng: -13.2056 },
+  { name: 'Koundara', region: 'Boké', lat: 12.4789, lng: -13.3025 },
+  { name: 'Kindia', region: 'Kindia', lat: 10.0566, lng: -12.8651 },
+  { name: 'Coyah', region: 'Kindia', lat: 9.7167, lng: -13.3833 },
+  { name: 'Dubréka', region: 'Kindia', lat: 9.7903, lng: -13.5217 },
+  { name: 'Forécariah', region: 'Kindia', lat: 9.4297, lng: -13.0875 },
+  { name: 'Télimélé', region: 'Kindia', lat: 10.9069, lng: -13.0319 },
+  { name: 'Labé', region: 'Labé', lat: 11.3175, lng: -12.2833 },
+  { name: 'Koubia', region: 'Labé', lat: 11.7833, lng: -11.9667 },
+  { name: 'Lélouma', region: 'Labé', lat: 11.45, lng: -12.7 },
+  { name: 'Mali', region: 'Labé', lat: 12.0833, lng: -12.3 },
+  { name: 'Tougué', region: 'Labé', lat: 11.4456, lng: -11.6789 },
+  { name: 'Mamou', region: 'Mamou', lat: 10.3754, lng: -12.0913 },
+  { name: 'Dalaba', region: 'Mamou', lat: 10.6857, lng: -12.2503 },
+  { name: 'Pita', region: 'Mamou', lat: 10.7708, lng: -12.4017 },
+  { name: 'Faranah', region: 'Faranah', lat: 10.0333, lng: -10.7333 },
+  { name: 'Dabola', region: 'Faranah', lat: 10.7497, lng: -11.1133 },
+  { name: 'Dinguiraye', region: 'Faranah', lat: 11.3, lng: -10.7167 },
+  { name: 'Kissidougou', region: 'Faranah', lat: 9.1842, lng: -10.1011 },
+  { name: 'Kankan', region: 'Kankan', lat: 10.3854, lng: -9.3056 },
+  { name: 'Kérouané', region: 'Kankan', lat: 9.2667, lng: -9.0167 },
+  { name: 'Kouroussa', region: 'Kankan', lat: 10.6517, lng: -9.8856 },
+  { name: 'Mandiana', region: 'Kankan', lat: 10.6333, lng: -8.6833 },
+  { name: 'Siguiri', region: 'Kankan', lat: 11.4178, lng: -9.166 },
+  { name: 'Nzérékoré', region: 'Nzérékoré', lat: 7.7548, lng: -8.8186 },
+  { name: 'Beyla', region: 'Nzérékoré', lat: 8.6889, lng: -8.6486 },
+  { name: 'Guéckédou', region: 'Nzérékoré', lat: 8.5667, lng: -10.1333 },
+  { name: 'Lola', region: 'Nzérékoré', lat: 7.8019, lng: -8.5278 },
+  { name: 'Macenta', region: 'Nzérékoré', lat: 8.5375, lng: -9.4708 },
+  { name: 'Yomou', region: 'Nzérékoré', lat: 7.5664, lng: -9.2592 },
+];
+
+const GUINEA_CENTER = { latitude: 10.0, longitude: -11.0 };
+const GUINEA_ZOOM = 6;
+
+function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
+  const dLat = a.lat - b.lat;
+  const dLng = a.lng - b.lng;
+  // Crude planar distance; fine for "nearest city in Guinea" snapping.
+  return Math.sqrt(dLat * dLat + dLng * dLng);
+}
+
+export function CityMapPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (city: string) => void;
+}) {
+  const { colors, radii } = useTheme();
+  const initialRegion = (GUINEA_CITIES.find((c) => c.name === value)?.region ??
+    'Conakry') as Region;
+  const [activeRegion, setActiveRegion] = useState<Region>(initialRegion);
+  const regionScrollRef = useRef<ScrollView | null>(null);
+  const cityScrollRef = useRef<ScrollView | null>(null);
+  const regionTabLayouts = useRef<Record<string, { x: number; w: number }>>({});
+  const cityChipLayouts = useRef<Record<string, { x: number; w: number }>>({});
+
+  const [camera, setCamera] = useState(() => {
+    const c = GUINEA_CITIES.find((x) => x.name === value);
+    return c
+      ? { coordinates: { latitude: c.lat, longitude: c.lng }, zoom: 8 }
+      : { coordinates: GUINEA_CENTER, zoom: GUINEA_ZOOM };
+  });
+
+  const citiesInRegion = useMemo(
+    () => GUINEA_CITIES.filter((c) => c.region === activeRegion),
+    [activeRegion],
+  );
+
+  // Keep the active region tab and selected city chip in view
+  useEffect(() => {
+    const r = regionTabLayouts.current[activeRegion];
+    if (r && regionScrollRef.current) {
+      regionScrollRef.current.scrollTo({ x: Math.max(0, r.x - 16), animated: true });
+    }
+  }, [activeRegion]);
+
+  useEffect(() => {
+    const c = cityChipLayouts.current[value];
+    if (c && cityScrollRef.current) {
+      cityScrollRef.current.scrollTo({ x: Math.max(0, c.x - 16), animated: true });
+    }
+  }, [value, activeRegion]);
+
+  const markers = useMemo(
+    () =>
+      GUINEA_CITIES.map((c) => ({
+        id: c.name,
+        coordinates: { latitude: c.lat, longitude: c.lng },
+        title: c.name,
+        tintColor: c.name === value ? colors.primary : colors.accent,
+        systemImage: c.name === value ? 'mappin.circle.fill' : 'mappin.circle',
+      })),
+    [value, colors],
+  );
+
+  // Google Maps marker schema differs slightly
+  const googleMarkers = useMemo(
+    () =>
+      GUINEA_CITIES.map((c) => ({
+        id: c.name,
+        coordinates: { latitude: c.lat, longitude: c.lng },
+        title: c.name,
+        snippet: c.name === value ? 'Sélectionné' : undefined,
+      })),
+    [value],
+  );
+
+  const handleSelect = (cityName: string) => {
+    haptic.selection();
+    onChange(cityName);
+    const c = GUINEA_CITIES.find((x) => x.name === cityName);
+    if (c) {
+      setCamera({ coordinates: { latitude: c.lat, longitude: c.lng }, zoom: 8 });
+      if (c.region !== activeRegion) setActiveRegion(c.region as Region);
+    }
+  };
+
+  const handleMapClick = (coordinates: { latitude?: number; longitude?: number }) => {
+    if (coordinates.latitude == null || coordinates.longitude == null) return;
+    // Snap to the nearest Guinea city
+    let nearest = GUINEA_CITIES[0]!;
+    let bestD = Infinity;
+    for (const c of GUINEA_CITIES) {
+      const d = distanceKm(
+        { lat: coordinates.latitude, lng: coordinates.longitude },
+        { lat: c.lat, lng: c.lng },
+      );
+      if (d < bestD) {
+        bestD = d;
+        nearest = c;
+      }
+    }
+    handleSelect(nearest.name);
+  };
+
+  return (
+    <View style={{ flex: 1, gap: 12 }}>
+      {/* Selected city banner */}
+      <View
+        style={{
+          paddingHorizontal: 14,
+          paddingVertical: 12,
+          borderRadius: radii.md,
+          borderWidth: 1.5,
+          borderColor: colors.primary,
+          backgroundColor: colors.primarySoft,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 10,
+        }}
+      >
+        <MapPin size={18} color={colors.primary} strokeWidth={2.25} />
+        <Text style={{ flex: 1, fontSize: 15, fontWeight: '600', color: colors.primaryDeep }}>
+          {value}
+        </Text>
+        <Check size={16} color={colors.primary} strokeWidth={3} />
+      </View>
+
+      {/* Region tabs */}
+      <View style={{ height: 36 }}>
+        <ScrollView
+          ref={regionScrollRef}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: 2,
+            gap: 6,
+            alignItems: 'center',
+          }}
+        >
+          {REGIONS.map((r) => {
+            const on = r === activeRegion;
+            return (
+              <Pressable
+                key={r}
+                onLayout={(e) => {
+                  regionTabLayouts.current[r] = {
+                    x: e.nativeEvent.layout.x,
+                    w: e.nativeEvent.layout.width,
+                  };
+                }}
+                onPress={() => {
+                  haptic.selection();
+                  setActiveRegion(r);
+                }}
+                style={{
+                  height: 32,
+                  paddingHorizontal: 14,
+                  borderRadius: 999,
+                  backgroundColor: on ? colors.text : colors.bgSunken,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 12.5,
+                    fontWeight: '600',
+                    color: on ? colors.bg : colors.textMuted,
+                    letterSpacing: 0.1,
+                  }}
+                >
+                  {r}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </View>
+
+      {/* City chips for the active region */}
+      <View style={{ height: 36 }}>
+        <ScrollView
+          ref={cityScrollRef}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: 2,
+            gap: 6,
+            alignItems: 'center',
+          }}
+        >
+          {citiesInRegion.map((c) => {
+            const on = c.name === value;
+            return (
+              <Pressable
+                key={c.name}
+                onLayout={(e) => {
+                  cityChipLayouts.current[c.name] = {
+                    x: e.nativeEvent.layout.x,
+                    w: e.nativeEvent.layout.width,
+                  };
+                }}
+                onPress={() => handleSelect(c.name)}
+                style={{
+                  height: 32,
+                  paddingHorizontal: 12,
+                  borderRadius: 999,
+                  borderWidth: 1,
+                  borderColor: on ? colors.primary : colors.border,
+                  backgroundColor: on ? colors.primarySoft : colors.card,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                }}
+              >
+                {on && <Check size={12} color={colors.primary} strokeWidth={3} />}
+                <Text
+                  style={{
+                    fontSize: 12.5,
+                    fontWeight: '600',
+                    color: on ? colors.primaryDeep : colors.text,
+                    letterSpacing: 0.1,
+                  }}
+                >
+                  {c.name}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </View>
+
+      {/* Map */}
+      <View
+        style={{
+          flex: 1,
+          borderRadius: radii.lg,
+          overflow: 'hidden',
+          borderWidth: 1,
+          borderColor: colors.border,
+          backgroundColor: colors.bgSunken,
+        }}
+      >
+        {Platform.OS === 'ios' ? (
+          <AppleMaps.View
+            style={{ flex: 1 }}
+            cameraPosition={camera}
+            markers={markers}
+            uiSettings={{ compassEnabled: false, scaleBarEnabled: false }}
+            onMarkerClick={(m) => {
+              if (m.id) handleSelect(m.id);
+            }}
+            onMapClick={(e) => handleMapClick(e.coordinates)}
+          />
+        ) : Platform.OS === 'android' ? (
+          <GoogleMaps.View
+            style={{ flex: 1 }}
+            cameraPosition={camera}
+            markers={googleMarkers}
+            uiSettings={{
+              compassEnabled: false,
+              zoomControlsEnabled: false,
+              myLocationButtonEnabled: false,
+            }}
+            onMarkerClick={(m) => {
+              if (m.id) handleSelect(m.id);
+            }}
+            onMapClick={(e) => handleMapClick(e.coordinates)}
+          />
+        ) : (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <Text tone="muted">La carte n'est pas disponible sur le web.</Text>
+          </View>
+        )}
+      </View>
+
+      <Text variant="caption" tone="muted" center style={{ letterSpacing: 0 }}>
+        Touche un point sur la carte ou un marqueur pour choisir ta ville.
+      </Text>
+    </View>
+  );
+}

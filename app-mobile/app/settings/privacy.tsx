@@ -1,0 +1,271 @@
+import { useState } from 'react';
+import { Pressable, ScrollView, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  Eye,
+  Sparkles,
+  BarChart3,
+  Download,
+  Trash2,
+  Lock,
+} from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
+import { useTheme } from '../../src/theme/ThemeProvider';
+import { Text } from '../../src/components/primitives/Text';
+import { Switch } from '../../src/components/primitives/Switch';
+import { ScreenHeader } from '../../src/components/nav/ScreenHeader';
+import { haptic } from '../../src/lib/haptics';
+
+export default function PrivacyRoute() {
+  const { colors } = useTheme();
+  const [personalize, setPersonalize] = useState(true);
+  const [analytics, setAnalytics] = useState(true);
+  const [adTracking, setAdTracking] = useState(false);
+  const [profilePublic, setProfilePublic] = useState(true);
+
+  return (
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 32 }}
+      >
+        <ScreenHeader
+          title="Confidentialité"
+          subtitle="Tu décides ce que Linky peut faire de tes données."
+        />
+
+        <SectionLabel label="Données" />
+        <Card>
+          <ToggleRow
+            Icon={Sparkles}
+            label="Recommandations personnalisées"
+            sub="Adapte ton feed Découvrir à tes goûts."
+            value={personalize}
+            onChange={setPersonalize}
+          />
+          <ToggleRow
+            Icon={BarChart3}
+            label="Statistiques anonymes"
+            sub="Aide-nous à améliorer l'app avec des stats agrégées."
+            value={analytics}
+            onChange={setAnalytics}
+          />
+          <ToggleRow
+            Icon={Eye}
+            label="Pub personnalisée"
+            sub="Reçois des promos plus pertinentes."
+            value={adTracking}
+            onChange={setAdTracking}
+            last
+          />
+        </Card>
+
+        <SectionLabel label="Profil" />
+        <Card>
+          <ToggleRow
+            Icon={Lock}
+            label="Profil public"
+            sub="Les autres utilisateurs peuvent voir ton nom et tes annonces."
+            value={profilePublic}
+            onChange={setProfilePublic}
+            last
+          />
+        </Card>
+
+        <SectionLabel label="Mes données" />
+        <Card>
+          <ActionRow
+            Icon={Download}
+            label="Télécharger mes données"
+            sub="On t'envoie une copie de tes données par email."
+          />
+          <ActionRow
+            Icon={Trash2}
+            label="Supprimer mon compte"
+            sub="Action définitive après 30 jours d'attente."
+            danger
+            last
+          />
+        </Card>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+// ===================================================================
+
+function SectionLabel({ label }: { label: string }) {
+  const { colors } = useTheme();
+  return (
+    <Text
+      style={{
+        fontSize: 11,
+        fontWeight: '700',
+        color: colors.textFaint,
+        letterSpacing: 0.6,
+        paddingHorizontal: 28,
+        marginTop: 22,
+        marginBottom: 10,
+      }}
+    >
+      {label.toUpperCase()}
+    </Text>
+  );
+}
+
+function Card({ children }: { children: React.ReactNode }) {
+  const { colors } = useTheme();
+  return (
+    <View
+      style={{
+        marginHorizontal: 24,
+        borderRadius: 18,
+        backgroundColor: colors.card,
+        borderWidth: 1,
+        borderColor: colors.border,
+        overflow: 'hidden',
+      }}
+    >
+      {children}
+    </View>
+  );
+}
+
+function ToggleRow({
+  Icon,
+  label,
+  sub,
+  value,
+  onChange,
+  last,
+}: {
+  Icon: LucideIcon;
+  label: string;
+  sub: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
+  last?: boolean;
+}) {
+  const { colors } = useTheme();
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        gap: 14,
+        paddingHorizontal: 14,
+        paddingVertical: 14,
+        borderBottomWidth: last ? 0 : 1,
+        borderBottomColor: colors.border,
+        alignItems: 'center',
+      }}
+    >
+      <View
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 12,
+          backgroundColor: colors.bgSunken,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icon size={16} color={colors.text} strokeWidth={1.75} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text
+          style={{
+            fontSize: 14.5,
+            fontWeight: '600',
+            color: colors.text,
+            letterSpacing: 0,
+            lineHeight: 18,
+            includeFontPadding: false,
+          }}
+        >
+          {label}
+        </Text>
+        <Text
+          style={{
+            fontSize: 12,
+            color: colors.textMuted,
+            marginTop: 2,
+            letterSpacing: 0,
+            lineHeight: 16,
+          }}
+        >
+          {sub}
+        </Text>
+      </View>
+      <Switch value={value} onChange={onChange} />
+    </View>
+  );
+}
+
+function ActionRow({
+  Icon,
+  label,
+  sub,
+  danger,
+  last,
+}: {
+  Icon: LucideIcon;
+  label: string;
+  sub: string;
+  danger?: boolean;
+  last?: boolean;
+}) {
+  const { colors } = useTheme();
+  const fg = danger ? colors.danger : colors.text;
+  return (
+    <Pressable
+      onPress={() => haptic.light()}
+      style={{
+        flexDirection: 'row',
+        gap: 14,
+        paddingHorizontal: 14,
+        paddingVertical: 14,
+        borderBottomWidth: last ? 0 : 1,
+        borderBottomColor: colors.border,
+        alignItems: 'center',
+      }}
+    >
+      <View
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 12,
+          backgroundColor: danger ? 'rgba(209,79,60,0.10)' : colors.bgSunken,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icon size={16} color={fg} strokeWidth={1.75} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text
+          style={{
+            fontSize: 14.5,
+            fontWeight: '600',
+            color: fg,
+            letterSpacing: 0,
+            lineHeight: 18,
+            includeFontPadding: false,
+          }}
+        >
+          {label}
+        </Text>
+        <Text
+          style={{
+            fontSize: 12,
+            color: colors.textMuted,
+            marginTop: 2,
+            letterSpacing: 0,
+            lineHeight: 16,
+          }}
+        >
+          {sub}
+        </Text>
+      </View>
+    </Pressable>
+  );
+}

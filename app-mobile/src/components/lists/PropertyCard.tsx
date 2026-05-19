@@ -1,0 +1,105 @@
+import { Pressable, View } from 'react-native';
+import { Image } from 'expo-image';
+import { router } from 'expo-router';
+import { useTheme } from '../../theme/ThemeProvider';
+import { Text } from '../primitives/Text';
+import { Badge } from '../primitives/Badge';
+import { I } from '../../icons/Icon';
+import { formatGNF, formatDistance } from '../../lib/format';
+import type { Property } from '../../data/types';
+
+export function PropertyCard({ property }: { property: Property }) {
+  const { colors, radii } = useTheme();
+  return (
+    <Pressable
+      onPress={() => router.push(`/property/${property.id}`)}
+      style={{
+        backgroundColor: colors.card,
+        borderWidth: 1,
+        borderColor: colors.border,
+        borderRadius: 18,
+        overflow: 'hidden',
+      }}
+      accessibilityRole="button"
+      accessibilityLabel={`${property.title}, ${formatGNF(property.priceGnf)}${property.perMonth ? ' par mois' : ''}`}
+    >
+      <View style={{ aspectRatio: 16 / 9, backgroundColor: colors.bgSunken }}>
+        <Image source={property.photos[0]} contentFit="cover" style={{ flex: 1 }} recyclingKey={property.id} transition={120} />
+        {property.ownerId === 'u_mamadou' && (
+          <View style={{ position: 'absolute', top: 10, left: 10 }}>
+            <Badge tone="verified" />
+          </View>
+        )}
+        {property.badge && (
+          <View style={{ position: 'absolute', top: 10, right: 10 }}>
+            <Badge tone={property.badge === 'Réservé' ? 'reserved' : 'new'} label={property.badge} />
+          </View>
+        )}
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 10,
+            right: 10,
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderRadius: radii.md,
+            backgroundColor: 'rgba(0,0,0,0.78)',
+          }}
+        >
+          <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14, fontVariant: ['tabular-nums'] }}>
+            {formatGNF(property.priceGnf)}
+            {property.perMonth && (
+              <Text style={{ fontSize: 10, fontWeight: '500', opacity: 0.85 }}> /mois</Text>
+            )}
+          </Text>
+        </View>
+      </View>
+      <View style={{ padding: 14, gap: 6 }}>
+        <Text variant="titleM" numberOfLines={2}>
+          {property.title}
+        </Text>
+        <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <View style={{ flexDirection: 'row', gap: 3, alignItems: 'center' }}>
+            <I.pin size={12} color={colors.textMuted} />
+            <Text variant="caption" tone="muted">
+              {property.district}
+            </Text>
+          </View>
+          {property.bedrooms && (
+            <View style={{ flexDirection: 'row', gap: 3, alignItems: 'center' }}>
+              <I.bed size={12} color={colors.textMuted} />
+              <Text variant="caption" tone="muted">
+                {property.bedrooms}
+              </Text>
+            </View>
+          )}
+          {property.areaSqm && (
+            <View style={{ flexDirection: 'row', gap: 3, alignItems: 'center' }}>
+              <I.area size={12} color={colors.textMuted} />
+              <Text variant="caption" tone="muted">
+                {property.areaSqm}m²
+              </Text>
+            </View>
+          )}
+        </View>
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            paddingHorizontal: 10,
+            paddingVertical: 4,
+            borderRadius: 999,
+            backgroundColor: colors.accentSoft,
+            flexDirection: 'row',
+            gap: 4,
+            alignItems: 'center',
+          }}
+        >
+          <I.road size={12} color={colors.accentText} />
+          <Text style={{ color: colors.accentText, fontSize: 11, fontWeight: '600' }}>
+            {formatDistance(property.distanceToRoadMeters)}
+          </Text>
+        </View>
+      </View>
+    </Pressable>
+  );
+}

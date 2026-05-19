@@ -1,0 +1,42 @@
+# Internal planning / AI prompts — kept local
+01_claude_design_prompt.md
+02_mobile_frontend_prompt.md
+03_landing_frontend_prompt.md
+04_admin_frontend_prompt.md
+05_logo_prompt.md
+06_logo_video_prompt.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node / Expo
+**/node_modules/
+**/.expo/
+**/.expo-shared/
+**/dist/
+**/build/
+**/web-build/
+
+# iOS / Android native
+**/ios/Pods/
+**/ios/build/
+**/android/.gradle/
+**/android/build/
+**/android/app/build/
+**/android/local.properties
+
+# Logs + env
+*.log
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Misc
+*.tsbuildinfo
+.eslintcache

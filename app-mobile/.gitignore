@@ -1,0 +1,12 @@
+node_modules/
+.expo/
+dist/
+.expo-shared/
+ios/
+android/
+*.log
+.DS_Store
+.env*
+!.env.example
+expo-env.d.ts
+nativewind-env.d.ts

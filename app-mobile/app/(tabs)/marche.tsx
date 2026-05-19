@@ -1,0 +1,635 @@
+import { useEffect, useState } from 'react';
+import { ScrollView, View, Pressable } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  Search,
+  SlidersHorizontal,
+  Camera,
+  ArrowUpDown,
+  ShoppingBag,
+  Home as HomeIcon,
+  Telescope,
+} from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
+import { useTheme } from '../../src/theme/ThemeProvider';
+import { Text } from '../../src/components/primitives/Text';
+import { ProductCard } from '../../src/components/lists/ProductCard';
+import { PropertyCard } from '../../src/components/lists/PropertyCard';
+import { ProductCardSkeleton } from '../../src/components/primitives/Skeleton';
+import { Sheet } from '../../src/components/sheets/Sheet';
+import { MicroLabel } from '../../src/components/lists/SectionHeader';
+import { Switch } from '../../src/components/primitives/Switch';
+import { Button } from '../../src/components/primitives/Button';
+import { Chip } from '../../src/components/primitives/Chip';
+import { haptic } from '../../src/lib/haptics';
+import { useFilters } from '../../src/stores/filters';
+import { useAuth } from '../../src/stores/auth';
+import { useProducts, useProperties } from '../../src/data/queries';
+import { formatGNF } from '../../src/lib/format';
+
+const PRODUCT_CATEGORIES = ['Tout', 'Mode', 'Électronique', 'Maison', 'Beauté', 'Auto'];
+const PROPERTY_TYPES: { value: 'location' | 'vente' | 'terrain'; label: string }[] = [
+  { value: 'location', label: 'Location' },
+  { value: 'vente', label: 'Vente' },
+  { value: 'terrain', label: 'Terrains' },
+];
+
+export default function MarcheRoute() {
+  const { colors } = useTheme();
+  const filters = useFilters();
+  const roles = useAuth((s) => s.roles);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  // Tab visibility by role.
+  // Pure agent → only Immobilier. Pure seller → only Articles. Everyone else → both.
+  const isBuyer = roles.includes('buyer');
+  const isSeller = roles.includes('seller');
+  const isAgent = roles.includes('agent');
+  const isPureAgent = isAgent && !isSeller && !isBuyer;
+  const isPureSeller = isSeller && !isAgent && !isBuyer;
+  const showArticles = !isPureAgent;
+  const showImmobilier = !isPureSeller;
+  const showSwitcher = showArticles && showImmobilier;
+
+  // Force the marche tab to the only available section when role locks it.
+  useEffect(() => {
+    if (isPureAgent && filters.marcheTab !== 'immobilier') {
+      filters.setMarcheTab('immobilier');
+    } else if (isPureSeller && filters.marcheTab !== 'articles') {
+      filters.setMarcheTab('articles');
+    }
+  }, [isPureAgent, isPureSeller, filters]);
+
+  const { data: products, isLoading: prodLoading } = useProducts({
+    category: filters.productCategory === 'all' ? undefined : filters.productCategory,
+  });
+  const { data: properties, isLoading: propLoading } = useProperties({
+    type: filters.propertyType,
+    city: filters.city ?? undefined,
+    rooms: filters.rooms,
+    priceMaxGnf: filters.priceMaxGnf,
+    distanceToRoadMaxM: filters.distanceToRoadMaxM,
+    furnishedOnly: filters.furnishedOnly,
+  });
+
+  // Effective tab: respects role locks even before useEffect syncs the store.
+  const effectiveTab = isPureAgent
+    ? 'immobilier'
+    : isPureSeller
+      ? 'articles'
+      : filters.marcheTab;
+  const isArticles = effectiveTab === 'articles';
+  const placeholder = isArticles ? 'Cherche un produit…' : 'Quartier, type, surface…';
+  const isPurePro = isPureAgent || isPureSeller;
+
+  return (
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 32 }}
+        stickyHeaderIndices={[]}
+      >
+        {/* ===== Header ===== */}
+        <View style={{ paddingHorizontal: 24, paddingTop: 16 }}>
+          <Text
+            style={{
+              fontSize: 32,
+              fontWeight: '700',
+              color: colors.text,
+              letterSpacing: -0.5,
+              lineHeight: 38,
+            }}
+          >
+            {isPurePro ? 'Concurrence' : 'Marché'}
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              color: colors.textMuted,
+              marginTop: 4,
+              letterSpacing: 0,
+              lineHeight: 20,
+            }}
+          >
+            {isPureSeller
+              ? 'Scout les autres boutiques de ta catégorie.'
+              : isPureAgent
+                ? 'Surveille les autres biens à Conakry.'
+                : isArticles
+                  ? 'Découvre des milliers d\'articles.'
+                  : 'Trouve ton prochain logement.'}
+          </Text>
+        </View>
+
+        {/* Pro banner — only when user is pure pro */}
+        {isPurePro && (
+          <View style={{ paddingHorizontal: 24, paddingTop: 16 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 12,
+                padding: 14,
+                borderRadius: 16,
+                backgroundColor: colors.primarySoft,
+                borderWidth: 1,
+                borderColor: 'rgba(15,114,86,0.18)',
+              }}
+            >
+              <View
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 12,
+                  backgroundColor: colors.primary,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Telescope size={18} color="#FFFFFF" strokeWidth={2} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: '700',
+                    color: colors.primaryDeep,
+                    letterSpacing: 0,
+                    lineHeight: 16,
+                    includeFontPadding: false,
+                  }}
+                >
+                  Mode scout
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: colors.primaryDeep,
+                    marginTop: 2,
+                    letterSpacing: 0,
+                    lineHeight: 16,
+                    opacity: 0.75,
+                  }}
+                >
+                  {isPureSeller
+                    ? 'Compare tes prix et idées avec les autres vendeurs.'
+                    : 'Compare tes biens avec ceux du marché.'}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* ===== Tab pills (hidden when user is pure pro of one type) ===== */}
+        {showSwitcher && (
+          <View style={{ paddingHorizontal: 24, marginTop: 20 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                gap: 8,
+              }}
+            >
+              <TabPill
+                Icon={ShoppingBag}
+                label="Articles"
+                active={isArticles}
+                onPress={() => filters.setMarcheTab('articles')}
+              />
+              <TabPill
+                Icon={HomeIcon}
+                label="Immobilier"
+                active={!isArticles}
+                onPress={() => filters.setMarcheTab('immobilier')}
+              />
+            </View>
+          </View>
+        )}
+
+        {/* ===== Search + filter ===== */}
+        <View
+          style={{
+            paddingHorizontal: 24,
+            marginTop: 16,
+            flexDirection: 'row',
+            gap: 10,
+            alignItems: 'center',
+          }}
+        >
+          <View
+            style={{
+              flex: 1,
+              height: 54,
+              borderRadius: 999,
+              backgroundColor: colors.card,
+              borderWidth: 1,
+              borderColor: colors.border,
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingLeft: 18,
+              paddingRight: 6,
+            }}
+          >
+            <Search size={18} color={colors.textMuted} strokeWidth={2} />
+            <Text
+              style={{
+                flex: 1,
+                fontSize: 14.5,
+                color: colors.textFaint,
+                letterSpacing: 0,
+                marginLeft: 10,
+              }}
+              numberOfLines={1}
+            >
+              {placeholder}
+            </Text>
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 999,
+                backgroundColor: colors.primarySoft,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Camera size={16} color={colors.primary} strokeWidth={1.75} />
+            </View>
+          </View>
+          <Pressable
+            onPress={() => {
+              haptic.light();
+              setSheetOpen(true);
+            }}
+            accessibilityLabel="Filtres"
+            style={{
+              width: 54,
+              height: 54,
+              borderRadius: 999,
+              backgroundColor: colors.text,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <SlidersHorizontal size={18} color={colors.bg} strokeWidth={2} />
+          </Pressable>
+        </View>
+
+        {/* ===== Category chips ===== */}
+        <View style={{ marginTop: 18 }}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 24,
+              gap: 8,
+              alignItems: 'center',
+            }}
+          >
+            {isArticles
+              ? PRODUCT_CATEGORIES.map((c) => {
+                  const active =
+                    filters.productCategory === 'all' ? c === 'Tout' : c === filters.productCategory;
+                  return (
+                    <CategoryPill
+                      key={c}
+                      label={c}
+                      active={active}
+                      onPress={() => filters.setProductCategory(c === 'Tout' ? 'all' : c)}
+                    />
+                  );
+                })
+              : PROPERTY_TYPES.map((t) => (
+                  <CategoryPill
+                    key={t.value}
+                    label={t.label}
+                    active={filters.propertyType === t.value}
+                    onPress={() => filters.setPropertyType(t.value)}
+                  />
+                ))}
+          </ScrollView>
+        </View>
+
+        {/* ===== Results header ===== */}
+        <View
+          style={{
+            paddingHorizontal: 24,
+            marginTop: 22,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: '700',
+                color: colors.text,
+                fontVariant: ['tabular-nums'],
+              }}
+            >
+              {(isArticles ? products?.length : properties?.length) ?? 0}
+            </Text>
+            <Text style={{ fontSize: 13.5, color: colors.textMuted, letterSpacing: 0 }}>
+              résultats
+            </Text>
+          </View>
+          <Pressable
+            hitSlop={8}
+            style={{
+              flexDirection: 'row',
+              gap: 6,
+              alignItems: 'center',
+              paddingHorizontal: 12,
+              height: 32,
+              borderRadius: 999,
+              borderWidth: 1,
+              borderColor: colors.border,
+              backgroundColor: colors.card,
+            }}
+          >
+            <ArrowUpDown size={13} color={colors.text} strokeWidth={2} />
+            <Text
+              style={{
+                fontSize: 12.5,
+                fontWeight: '600',
+                color: colors.text,
+                letterSpacing: 0,
+                lineHeight: 14,
+                includeFontPadding: false,
+              }}
+            >
+              Pertinence
+            </Text>
+          </Pressable>
+        </View>
+
+        {/* ===== Grid ===== */}
+        {isArticles ? (
+          <View
+            style={{
+              paddingHorizontal: 24,
+              marginTop: 14,
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              gap: 14,
+            }}
+          >
+            {prodLoading
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <View key={i} style={{ flexBasis: '47%', flexGrow: 1 }}>
+                    <ProductCardSkeleton />
+                  </View>
+                ))
+              : products?.map((p) => (
+                  <View key={p.id} style={{ flexBasis: '47%', flexGrow: 1 }}>
+                    <ProductCard product={p} />
+                  </View>
+                ))}
+          </View>
+        ) : (
+          <View style={{ paddingHorizontal: 24, marginTop: 14, gap: 14 }}>
+            {propLoading
+              ? Array.from({ length: 3 }).map((_, i) => <ProductCardSkeleton key={i} />)
+              : properties?.map((p) => <PropertyCard key={p.id} property={p} />)}
+          </View>
+        )}
+      </ScrollView>
+
+      {/* ===== Filter sheet ===== */}
+      <Sheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Filtres" snapPoints={['80%']}>
+        <ScrollView style={{ paddingHorizontal: 16, paddingTop: 12 }}>
+          <MicroLabel label="Type" />
+          <View style={{ flexDirection: 'row', gap: 6, marginBottom: 18 }}>
+            {PROPERTY_TYPES.map((t) => (
+              <Chip
+                key={t.value}
+                label={t.label}
+                active={filters.propertyType === t.value}
+                onPress={() => filters.setPropertyType(t.value)}
+                block
+              />
+            ))}
+          </View>
+
+          <MicroLabel label="Prix par mois" />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+            <Text variant="caption" style={{ fontVariant: ['tabular-nums'], fontWeight: '600' }}>
+              {formatGNF(filters.priceMinGnf)}
+            </Text>
+            <Text variant="caption" style={{ fontVariant: ['tabular-nums'], fontWeight: '600' }}>
+              {formatGNF(filters.priceMaxGnf)}
+            </Text>
+          </View>
+          <View
+            style={{
+              height: 6,
+              borderRadius: 999,
+              backgroundColor: colors.border,
+              marginBottom: 20,
+              position: 'relative',
+            }}
+          >
+            <View
+              style={{
+                position: 'absolute',
+                left: '10%',
+                right: '30%',
+                top: 0,
+                bottom: 0,
+                backgroundColor: colors.primary,
+                borderRadius: 999,
+              }}
+            />
+          </View>
+
+          <MicroLabel label="Ville" />
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 18 }}>
+            {['Conakry', 'Kindia', 'Kankan', 'Labé', 'Boké'].map((c) => (
+              <Chip
+                key={c}
+                label={c}
+                active={filters.city === c}
+                onPress={() => filters.setCity(filters.city === c ? null : c)}
+              />
+            ))}
+          </View>
+
+          <MicroLabel label="Pièces" />
+          <View style={{ flexDirection: 'row', gap: 6, marginBottom: 18 }}>
+            {['Studio', '1', '2', '3', '4+'].map((r) => (
+              <Chip
+                key={r}
+                label={r}
+                active={filters.rooms === r.toLowerCase() || filters.rooms === r}
+                onPress={() => filters.setRooms(filters.rooms === r ? null : r)}
+                block
+              />
+            ))}
+          </View>
+
+          <MicroLabel label="Distance max au goudron" />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+            <Text variant="caption">0 m</Text>
+            <Text variant="caption" style={{ color: colors.accent, fontWeight: '600' }}>
+              {filters.distanceToRoadMaxM <= 1000
+                ? `${filters.distanceToRoadMaxM} m`
+                : `${(filters.distanceToRoadMaxM / 1000).toFixed(1)} km`}
+            </Text>
+            <Text variant="caption">2 km</Text>
+          </View>
+          <View
+            style={{
+              height: 6,
+              borderRadius: 999,
+              backgroundColor: colors.border,
+              marginBottom: 20,
+              position: 'relative',
+            }}
+          >
+            <View
+              style={{
+                position: 'absolute',
+                left: 0,
+                width: `${Math.min(100, (filters.distanceToRoadMaxM / 2000) * 100)}%`,
+                top: 0,
+                bottom: 0,
+                backgroundColor: colors.accent,
+                borderRadius: 999,
+              }}
+            />
+          </View>
+
+          <MicroLabel label="Meublé" />
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingVertical: 6,
+            }}
+          >
+            <Text style={{ fontSize: 13, fontWeight: '500' }}>Uniquement meublé</Text>
+            <Switch value={filters.furnishedOnly} onChange={filters.setFurnishedOnly} />
+          </View>
+        </ScrollView>
+        <View
+          style={{
+            flexDirection: 'row',
+            gap: 8,
+            padding: 16,
+            borderTopWidth: 1,
+            borderTopColor: colors.border,
+          }}
+        >
+          <Button
+            variant="secondary"
+            label="Effacer"
+            style={{ flex: 1 }}
+            onPress={() => filters.reset()}
+          />
+          <Button
+            variant="primary"
+            label={`Voir ${properties?.length ?? 0} biens`}
+            style={{ flex: 2 }}
+            onPress={() => setSheetOpen(false)}
+          />
+        </View>
+      </Sheet>
+    </SafeAreaView>
+  );
+}
+
+// ---------- Subcomponents ----------
+
+function TabPill({
+  Icon,
+  label,
+  active,
+  onPress,
+}: {
+  Icon: LucideIcon;
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  const { colors } = useTheme();
+  return (
+    <Pressable
+      onPress={() => {
+        haptic.selection();
+        onPress();
+      }}
+      style={{
+        flex: 1,
+        height: 46,
+        borderRadius: 999,
+        backgroundColor: active ? colors.text : 'transparent',
+        borderWidth: 1,
+        borderColor: active ? colors.text : colors.border,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+      }}
+    >
+      <Icon size={16} color={active ? colors.bg : colors.text} strokeWidth={1.75} />
+      <Text
+        style={{
+          fontSize: 14,
+          fontWeight: '600',
+          color: active ? colors.bg : colors.text,
+          letterSpacing: 0,
+          lineHeight: 17,
+          includeFontPadding: false,
+        }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+function CategoryPill({
+  label,
+  active,
+  onPress,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  const { colors } = useTheme();
+  return (
+    <Pressable
+      onPress={() => {
+        haptic.selection();
+        onPress();
+      }}
+      style={{
+        height: 38,
+        paddingHorizontal: 16,
+        borderRadius: 999,
+        backgroundColor: active ? colors.text : colors.card,
+        borderWidth: 1,
+        borderColor: active ? colors.text : colors.border,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 13.5,
+          fontWeight: '600',
+          color: active ? colors.bg : colors.text,
+          letterSpacing: 0,
+          lineHeight: 16,
+          includeFontPadding: false,
+        }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}

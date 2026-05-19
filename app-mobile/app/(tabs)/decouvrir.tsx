@@ -1,0 +1,74 @@
+import { useCallback, useState } from 'react';
+import { Dimensions, View } from 'react-native';
+import { FlashList, type FlashListRef } from '@shopify/flash-list';
+import { useRef } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { useTheme } from '../../src/theme/ThemeProvider';
+import { DiscoverCard, DiscoverEnd } from '../../src/components/discover/DiscoverCard';
+import { useDiscoverFeed } from '../../src/data/queries';
+import type { DiscoverItem } from '../../src/data/types';
+import { Text } from '../../src/components/primitives/Text';
+import { useAuth } from '../../src/stores/auth';
+
+const { height: SH } = Dimensions.get('window');
+
+type FeedRow = { kind: 'item'; data: DiscoverItem; id: string } | { kind: 'end'; id: string };
+
+export default function DecouvrirRoute() {
+  const { colors } = useTheme();
+  const roles = useAuth((s) => s.roles);
+  // Role-aware feed: pure agents see only properties, pure sellers see only products.
+  const isBuyer = roles.includes('buyer');
+  const isSeller = roles.includes('seller');
+  const isAgent = roles.includes('agent');
+  const isPureAgent = isAgent && !isSeller && !isBuyer;
+  const isPureSeller = isSeller && !isAgent && !isBuyer;
+  const feedFilter = isPureAgent ? 'properties' : isPureSeller ? 'products' : 'all';
+
+  const { data, isLoading, refetch } = useDiscoverFeed(feedFilter);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const listRef = useRef<FlashListRef<FeedRow>>(null);
+
+  const rows: FeedRow[] =
+    data?.map((d, i) => ({ kind: 'item' as const, data: d, id: `${d.kind}-${d.item.id}-${i}` })) ?? [];
+  rows.push({ kind: 'end', id: 'end' });
+
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems }: { viewableItems: { index: number | null }[] }) => {
+      const idx = viewableItems[0]?.index ?? 0;
+      setActiveIndex(idx);
+    },
+    [],
+  );
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.discoverBg }}>
+      <StatusBar style="light" />
+      {isLoading ? (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: '#FFFFFF', opacity: 0.6 }}>Chargement du feed…</Text>
+        </View>
+      ) : (
+        <FlashList
+          ref={listRef}
+          data={rows}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) =>
+            item.kind === 'end' ? (
+              <DiscoverEnd onRefresh={() => { void refetch(); listRef.current?.scrollToIndex({ index: 0, animated: true }); }} />
+            ) : (
+              <DiscoverCard data={item.data} isActive={index === activeIndex} height={SH} />
+            )
+          }
+          pagingEnabled
+          snapToInterval={SH}
+          snapToAlignment="start"
+          decelerationRate="fast"
+          showsVerticalScrollIndicator={false}
+          viewabilityConfig={{ itemVisiblePercentThreshold: 70 }}
+          onViewableItemsChanged={onViewableItemsChanged}
+        />
+      )}
+    </View>
+  );
+}
