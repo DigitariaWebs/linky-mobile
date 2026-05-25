@@ -5,37 +5,37 @@ const LINKS: { title: string; items: { label: string; href: string }[] }[] = [
   {
     title: 'Produit',
     items: [
-      { label: 'Comment ça marche', href: '#comment' },
-      { label: 'Découvrir', href: '#decouvrir' },
-      { label: 'Pour la diaspora', href: '#diaspora' },
-      { label: 'FAQ', href: '#faq' },
+      { label: 'Comment ça marche', href: '/#comment' },
+      { label: 'Découvrir', href: '/#decouvrir' },
+      { label: 'Pour la diaspora', href: '/#diaspora' },
+      { label: 'FAQ', href: '/#faq' },
     ],
   },
   {
     title: 'Entreprise',
     items: [
-      { label: 'À propos', href: '#' },
-      { label: 'Blog', href: '#' },
-      { label: 'Carrières', href: '#' },
-      { label: 'Presse', href: '#' },
+      { label: 'À propos', href: '/about' },
+      { label: 'Blog', href: '/blog' },
+      { label: 'Carrières', href: '/careers' },
+      { label: 'Presse', href: '/press' },
     ],
   },
   {
     title: 'Support',
     items: [
-      { label: 'Centre d\'aide', href: '#' },
-      { label: 'Contact', href: '#' },
-      { label: 'Statut', href: '#' },
-      { label: 'Sécurité', href: '#' },
+      { label: "Centre d'aide", href: '/help' },
+      { label: 'Contact', href: '/contact' },
+      { label: 'Statut', href: '/status' },
+      { label: 'Sécurité', href: '/security' },
     ],
   },
   {
     title: 'Légal',
     items: [
-      { label: 'Conditions générales', href: '#' },
-      { label: 'Politique de confidentialité', href: '#' },
-      { label: 'Mentions légales', href: '#' },
-      { label: 'Cookies', href: '#' },
+      { label: 'Conditions générales', href: '/legal/terms' },
+      { label: 'Politique de confidentialité', href: '/legal/privacy' },
+      { label: 'Mentions légales', href: '/legal/notices' },
+      { label: 'Cookies', href: '/legal/cookies' },
     ],
   },
 ];
