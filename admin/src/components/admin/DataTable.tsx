@@ -51,29 +51,29 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         {searchKey && (
-          <div className="flex h-10 w-full max-w-md items-center gap-2 rounded-full border border-border bg-bg-elev px-4">
-            <Search size={14} className="text-text-muted" />
+          <div className="flex h-10 w-full max-w-md items-center gap-2 rounded-full border border-line bg-surface px-4">
+            <Search size={14} className="text-muted" />
             <input
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
               placeholder={searchPlaceholder}
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-text-faint"
+              className="flex-1 bg-transparent text-sm outline-none placeholder:text-faint"
             />
           </div>
         )}
         {toolbar}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-bg-elev">
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface">
         <table className="w-full text-sm">
-          <thead className="bg-bg-sunken/60">
+          <thead className="bg-sunken/60">
             {table.getHeaderGroups().map((group) => (
               <tr key={group.id}>
                 {group.headers.map((header) => (
                   <th
                     key={header.id}
                     onClick={header.column.getToggleSortingHandler()}
-                    className="cursor-pointer select-none border-b border-border px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-text-faint"
+                    className="cursor-pointer select-none border-b border-line px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-faint"
                   >
                     {header.isPlaceholder
                       ? null
@@ -90,7 +90,7 @@ export function DataTable<TData, TValue>({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-5 py-12 text-center text-sm text-text-muted"
+                  className="px-5 py-12 text-center text-sm text-muted"
                 >
                   Aucun résultat.
                 </td>
@@ -99,7 +99,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="border-b border-border last:border-0 hover:bg-bg-sunken/40"
+                  className="border-b border-line last:border-0 hover:bg-sunken/40"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="px-5 py-4">
@@ -114,7 +114,7 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between text-sm text-text-muted">
+      <div className="flex items-center justify-between text-sm text-muted">
         <div>
           {table.getFilteredRowModel().rows.length} résultats · page{' '}
           {table.getState().pagination.pageIndex + 1} /{' '}
@@ -124,14 +124,14 @@ export function DataTable<TData, TValue>({
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-bg-elev disabled:opacity-40"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface disabled:opacity-40"
           >
             <ChevronLeft size={14} />
           </button>
           <button
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-bg-elev disabled:opacity-40"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface disabled:opacity-40"
           >
             <ChevronRight size={14} />
           </button>

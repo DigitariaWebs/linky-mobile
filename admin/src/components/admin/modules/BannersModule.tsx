@@ -46,8 +46,8 @@ export function BannersModule() {
     <div className="grid gap-6 xl:grid-cols-[1.2fr_1fr]">
       {/* Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        <div className="rounded-2xl border border-border bg-bg-elev p-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-text-faint">
+        <div className="rounded-2xl border border-line bg-surface p-6">
+          <div className="text-xs font-bold uppercase tracking-wider text-faint">
             Composer
           </div>
 
@@ -55,7 +55,7 @@ export function BannersModule() {
             <Field label="Titre" error={errors.title?.message}>
               <input
                 {...register('title')}
-                className="h-12 w-full rounded-xl border border-border bg-bg-elev px-4 text-sm font-semibold outline-none focus:border-primary"
+                className="h-12 w-full rounded-xl border border-line bg-surface px-4 text-sm font-semibold outline-none focus:border-primary"
               />
             </Field>
 
@@ -63,7 +63,7 @@ export function BannersModule() {
               <textarea
                 {...register('body')}
                 rows={3}
-                className="w-full resize-none rounded-xl border border-border bg-bg-elev px-4 py-3 text-sm outline-none focus:border-primary"
+                className="w-full resize-none rounded-xl border border-line bg-surface px-4 py-3 text-sm outline-none focus:border-primary"
               />
             </Field>
 
@@ -71,13 +71,13 @@ export function BannersModule() {
               <Field label="Libellé du bouton" error={errors.cta?.message}>
                 <input
                   {...register('cta')}
-                  className="h-12 w-full rounded-xl border border-border bg-bg-elev px-4 text-sm font-semibold outline-none focus:border-primary"
+                  className="h-12 w-full rounded-xl border border-line bg-surface px-4 text-sm font-semibold outline-none focus:border-primary"
                 />
               </Field>
               <Field label="Audience" error={errors.audience?.message}>
                 <select
                   {...register('audience')}
-                  className="h-12 w-full rounded-xl border border-border bg-bg-elev px-4 text-sm font-semibold outline-none focus:border-primary"
+                  className="h-12 w-full rounded-xl border border-line bg-surface px-4 text-sm font-semibold outline-none focus:border-primary"
                 >
                   <option value="all">Tout le monde</option>
                   <option value="buyers">Acheteurs</option>
@@ -92,21 +92,21 @@ export function BannersModule() {
                 <input
                   type="date"
                   {...register('startsAt')}
-                  className="h-12 w-full rounded-xl border border-border bg-bg-elev px-4 text-sm font-semibold outline-none focus:border-primary"
+                  className="h-12 w-full rounded-xl border border-line bg-surface px-4 text-sm font-semibold outline-none focus:border-primary"
                 />
               </Field>
               <Field label="Fin" error={errors.endsAt?.message}>
                 <input
                   type="date"
                   {...register('endsAt')}
-                  className="h-12 w-full rounded-xl border border-border bg-bg-elev px-4 text-sm font-semibold outline-none focus:border-primary"
+                  className="h-12 w-full rounded-xl border border-line bg-surface px-4 text-sm font-semibold outline-none focus:border-primary"
                 />
               </Field>
             </div>
 
             <button
               type="submit"
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-text text-sm font-bold text-bg hover:opacity-90"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-black text-sm font-bold text-white hover:opacity-90"
             >
               <Calendar size={15} />
               Planifier la bannière
@@ -115,22 +115,22 @@ export function BannersModule() {
         </div>
 
         {/* Existing banners */}
-        <div className="rounded-2xl border border-border bg-bg-elev p-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-text-faint">
+        <div className="rounded-2xl border border-line bg-surface p-6">
+          <div className="text-xs font-bold uppercase tracking-wider text-faint">
             Bannières actuelles
           </div>
           <div className="mt-4 space-y-3">
             {bannersData.map((b) => (
               <div
                 key={b.id}
-                className="flex items-center gap-3 rounded-xl border border-border bg-bg-sunken/40 p-3"
+                className="flex items-center gap-3 rounded-xl border border-line bg-sunken/40 p-3"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-soft text-primary-deep">
                   <Megaphone size={16} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-bold">{b.title}</div>
-                  <div className="text-xs text-text-muted">
+                  <div className="text-xs text-muted">
                     {b.startsAt} → {b.endsAt}
                   </div>
                 </div>
@@ -140,7 +140,7 @@ export function BannersModule() {
                       ? 'bg-success/12 text-success'
                       : b.status === 'scheduled'
                         ? 'bg-accent-soft text-accent-text'
-                        : 'bg-bg-sunken text-text-muted'
+                        : 'bg-sunken text-muted'
                   }`}
                 >
                   {b.status}
@@ -153,18 +153,18 @@ export function BannersModule() {
 
       {/* Phone preview */}
       <div className="sticky top-0">
-        <div className="rounded-2xl border border-border bg-bg-elev p-6">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-faint">
+        <div className="rounded-2xl border border-line bg-surface p-6">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-faint">
             <Smartphone size={13} />
             Aperçu mobile
           </div>
           <div className="mt-4 flex justify-center">
             <div className="relative rounded-[40px] bg-black p-2.5 shadow-[var(--shadow-pop)]">
-              <div className="relative h-[520px] w-[260px] overflow-hidden rounded-[32px] bg-bg">
+              <div className="relative h-[520px] w-[260px] overflow-hidden rounded-[32px] bg-[#F7F3EC]">
                 <div className="absolute left-1/2 top-2 h-5 w-20 -translate-x-1/2 rounded-full bg-black" />
 
                 <div className="flex h-full flex-col p-5 pt-12">
-                  <div className="text-xs text-text-muted">Bonjour,</div>
+                  <div className="text-xs text-muted">Bonjour,</div>
                   <div className="text-base font-bold">Mariama</div>
 
                   {/* Banner preview */}
@@ -186,7 +186,7 @@ export function BannersModule() {
                     </button>
                   </div>
 
-                  <div className="mt-4 flex items-center gap-2 text-[10px] text-text-muted">
+                  <div className="mt-4 flex items-center gap-2 text-[10px] text-muted">
                     <Users size={11} />
                     <span>
                       Audience :{' '}
@@ -220,7 +220,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="text-[11px] font-bold uppercase tracking-wider text-text-faint">
+      <label className="text-[11px] font-bold uppercase tracking-wider text-faint">
         {label}
       </label>
       <div className="mt-2">{children}</div>

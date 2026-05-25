@@ -75,13 +75,13 @@ export function Overview() {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-text-faint">
+              <div className="text-xs font-bold uppercase tracking-wider text-faint">
                 Revenus 12 mois
               </div>
               <div className="mt-1 flex items-baseline gap-3">
                 <span className="font-display text-3xl font-bold">
                   2 524 M{' '}
-                  <span className="text-base font-semibold text-text-muted">
+                  <span className="text-base font-semibold text-muted">
                     GNF
                   </span>
                 </span>
@@ -138,7 +138,7 @@ export function Overview() {
         </Card>
 
         <Card>
-          <div className="text-xs font-bold uppercase tracking-wider text-text-faint">
+          <div className="text-xs font-bold uppercase tracking-wider text-faint">
             À traiter en priorité
           </div>
           <div className="mt-4 space-y-3">
@@ -168,7 +168,7 @@ export function Overview() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <div className="flex items-center justify-between">
-            <div className="text-xs font-bold uppercase tracking-wider text-text-faint">
+            <div className="text-xs font-bold uppercase tracking-wider text-faint">
               Dernières commandes
             </div>
             <a href="/orders" className="text-xs font-bold text-primary">
@@ -179,14 +179,14 @@ export function Overview() {
             {ordersData.slice(0, 5).map((o) => (
               <div
                 key={o.id}
-                className="flex items-center gap-3 rounded-xl border border-border bg-bg-elev/40 px-3 py-2.5"
+                className="flex items-center gap-3 rounded-xl border border-line bg-surface/40 px-3 py-2.5"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-bg-sunken text-[10px] font-bold text-text-muted">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sunken text-[10px] font-bold text-muted">
                   {o.ref.slice(-3)}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-bold">{o.product}</div>
-                  <div className="text-xs text-text-muted">
+                  <div className="text-xs text-muted">
                     {o.buyer} · {o.seller}
                   </div>
                 </div>
@@ -200,7 +200,7 @@ export function Overview() {
 
         <Card>
           <div className="flex items-center justify-between">
-            <div className="text-xs font-bold uppercase tracking-wider text-text-faint">
+            <div className="text-xs font-bold uppercase tracking-wider text-faint">
               KYC en attente
             </div>
             <a href="/kyc" className="text-xs font-bold text-primary">
@@ -214,14 +214,14 @@ export function Overview() {
               .map((k) => (
                 <div
                   key={k.id}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-bg-elev/40 px-3 py-2.5"
+                  className="flex items-center gap-3 rounded-xl border border-line bg-surface/40 px-3 py-2.5"
                 >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-sunken text-[11px] font-bold text-text-muted">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sunken text-[11px] font-bold text-muted">
                     {k.name.split(' ').map((p) => p[0]).join('').slice(0, 2)}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-bold">{k.name}</div>
-                    <div className="text-xs text-text-muted">{k.docType}</div>
+                    <div className="text-xs text-muted">{k.docType}</div>
                   </div>
                   <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-text">
                     {k.role}
@@ -237,7 +237,7 @@ export function Overview() {
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border bg-bg-elev p-6">
+    <div className="rounded-2xl border border-line bg-surface p-6">
       {children}
     </div>
   );
@@ -261,7 +261,7 @@ function KPICard({
   return (
     <Card>
       <div className="flex items-center justify-between">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg-sunken">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sunken">
           <Icon size={18} strokeWidth={1.75} />
         </div>
         <span className={`inline-flex items-center gap-1 text-xs font-bold ${tint}`}>
@@ -269,7 +269,7 @@ function KPICard({
           {delta}
         </span>
       </div>
-      <div className="mt-5 text-xs font-bold uppercase tracking-wider text-text-faint">
+      <div className="mt-5 text-xs font-bold uppercase tracking-wider text-faint">
         {label}
       </div>
       <div className="font-display mt-1 text-3xl font-bold tracking-tight tabular-nums">
@@ -289,11 +289,11 @@ function PriorityRow({
   accent?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-border bg-bg-elev/40 px-3 py-3">
-      <span className="text-sm font-semibold text-text">{label}</span>
+    <div className="flex items-center justify-between rounded-xl border border-line bg-surface/40 px-3 py-3">
+      <span className="text-sm font-semibold text-[#0E1311]">{label}</span>
       <span
         className={`inline-flex h-7 min-w-7 items-center justify-center rounded-full px-2.5 text-sm font-bold tabular-nums ${
-          accent ? 'bg-accent text-text' : 'bg-bg-sunken text-text-muted'
+          accent ? 'bg-accent text-[#0E1311]' : 'bg-sunken text-muted'
         }`}
       >
         {count}

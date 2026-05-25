@@ -26,7 +26,7 @@ export function Nav() {
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all ${
         scrolled
-          ? 'border-b border-border/60 bg-bg/85 backdrop-blur-md'
+          ? 'border-b border-line/60 bg-[#F7F3EC]/85 backdrop-blur-md'
           : 'border-b border-transparent bg-transparent'
       }`}
     >
@@ -51,7 +51,7 @@ export function Nav() {
             <a
               key={l.href}
               href={l.href}
-              className="rounded-full px-4 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-elev hover:text-text"
+              className="rounded-full px-4 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-[#0E1311]"
             >
               {l.label}
             </a>
@@ -61,7 +61,19 @@ export function Nav() {
         <div className="hidden md:block">
           <a
             href="#download"
-            className="inline-flex h-10 items-center rounded-full bg-text px-5 text-sm font-semibold text-bg transition-opacity hover:opacity-90"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              height: 40,
+              paddingLeft: 20,
+              paddingRight: 20,
+              borderRadius: 999,
+              backgroundColor: '#0E1311',
+              color: '#FFFFFF',
+              fontSize: 14,
+              fontWeight: 600,
+              textDecoration: 'none',
+            }}
           >
             Télécharger
           </a>
@@ -70,21 +82,21 @@ export function Nav() {
         <button
           aria-label="Menu"
           onClick={() => setOpen((s) => !s)}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-bg-elev md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface md:hidden"
         >
           {open ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
 
       {open && (
-        <div className="border-t border-border bg-bg-elev md:hidden">
+        <div className="border-t border-line bg-surface md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-1 px-6 py-3">
             {NAV_LINKS.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-text-muted hover:bg-bg hover:text-text"
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted hover:bg-[#F7F3EC] hover:text-[#0E1311]"
               >
                 {l.label}
               </a>
@@ -92,7 +104,7 @@ export function Nav() {
             <a
               href="#download"
               onClick={() => setOpen(false)}
-              className="mt-2 inline-flex h-11 items-center justify-center rounded-full bg-text px-5 text-sm font-semibold text-bg"
+              className="mt-2 inline-flex h-11 items-center justify-center rounded-full bg-black px-5 text-sm font-semibold text-white"
             >
               Télécharger l'app
             </a>

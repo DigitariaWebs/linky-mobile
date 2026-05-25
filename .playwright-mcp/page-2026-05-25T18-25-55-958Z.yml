@@ -1,0 +1,457 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e4]:
+      - link "Linky Linky" [ref=e5] [cursor=pointer]:
+        - /url: "#"
+        - img "Linky" [ref=e7]
+        - generic [ref=e8]: Linky
+      - navigation [ref=e9]:
+        - link "Comment ça marche" [ref=e10] [cursor=pointer]:
+          - /url: "#comment"
+        - link "Découvrir" [ref=e11] [cursor=pointer]:
+          - /url: "#decouvrir"
+        - link "Diaspora" [ref=e12] [cursor=pointer]:
+          - /url: "#diaspora"
+        - link "FAQ" [ref=e13] [cursor=pointer]:
+          - /url: "#faq"
+      - link "Télécharger" [ref=e15] [cursor=pointer]:
+        - /url: "#download"
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - img [ref=e20]
+          - generic [ref=e23]: Nouveau · disponible en Guinée
+        - heading "Le marché et l'immobilier en Guinée, dans une seule app." [level=1] [ref=e24]
+        - paragraph [ref=e25]: Achète, vends ou trouve un logement. Paiement Mobile Money sécurisé par escrow, vendeurs vérifiés, et un fil Découvrir pour repérer les pépites.
+        - generic [ref=e27]:
+          - link "Disponible sur App Store" [ref=e28] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e29]
+            - generic [ref=e32]:
+              - generic [ref=e33]: Disponible sur
+              - generic [ref=e34]: App Store
+          - link "Disponible sur Google Play" [ref=e35] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e36]
+            - generic [ref=e38]:
+              - generic [ref=e39]: Disponible sur
+              - generic [ref=e40]: Google Play
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - img [ref=e43]
+            - generic [ref=e46]: Paiement escrow
+          - generic [ref=e47]:
+            - img [ref=e48]
+            - generic [ref=e51]: Orange Money, MTN, carte bancaire
+          - generic [ref=e52]:
+            - img [ref=e53]
+            - generic [ref=e56]: Vendeurs KYC vérifiés
+      - generic [ref=e58]:
+        - generic [ref=e60]:
+          - img [ref=e62]
+          - generic [ref=e65]:
+            - generic [ref=e66]: Paiement sécurisé
+            - generic [ref=e67]: Escrow Mobile Money
+        - generic [ref=e69]:
+          - img [ref=e71]
+          - generic [ref=e74]:
+            - generic [ref=e75]: +30 % de visibilité
+            - generic [ref=e76]: Avec un boost
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - generic [ref=e83]: 9:41
+            - generic [ref=e84]: ●●●●● 􀙫
+          - generic [ref=e85]:
+            - generic [ref=e88]:
+              - generic [ref=e89]: Bonjour,
+              - generic [ref=e90]: Mariama
+            - generic [ref=e91]:
+              - generic [ref=e92]: Solde Linky
+              - generic [ref=e93]:
+                - generic [ref=e94]: 850 000
+                - generic [ref=e95]: GNF
+              - generic [ref=e96]:
+                - generic [ref=e97]: Recharger
+                - generic [ref=e98]: Retirer
+            - generic [ref=e99]:
+              - generic [ref=e102]: Mode
+              - generic [ref=e105]: Tech
+              - generic [ref=e108]: Maison
+              - generic [ref=e111]: Auto
+            - generic [ref=e112]:
+              - generic [ref=e115]:
+                - generic [ref=e116]: iPhone 12 Pro
+                - generic [ref=e117]: 4.8M GNF
+              - generic [ref=e120]:
+                - generic [ref=e121]: Robe wax
+                - generic [ref=e122]: 185k GNF
+          - generic [ref=e123]:
+            - generic [ref=e126]: Accueil
+            - generic [ref=e129]: Marché
+            - generic [ref=e130]:
+              - img [ref=e132]
+              - generic [ref=e135]: Découvrir
+            - generic [ref=e138]: Boutique
+            - generic [ref=e141]: Profil
+    - generic [ref=e143]:
+      - generic [ref=e144]:
+        - generic [ref=e145]: Tout dans une seule app
+        - heading "Pensé pour la Guinée. Conçu pour les deux côtés du marché." [level=2] [ref=e146]
+        - paragraph [ref=e147]: "Acheter, vendre, louer ou louer un bien : Linky tient debout sur trois piliers — la confiance, la simplicité, et le mobile-first."
+      - generic [ref=e148]:
+        - generic [ref=e149]:
+          - img [ref=e151]
+          - heading "Marketplace tout-en-un" [level=3] [ref=e154]
+          - paragraph [ref=e155]: Mode, électronique, beauté, auto. Vendeurs locaux et boutiques vérifiées dans tout le pays.
+        - generic [ref=e156]:
+          - img [ref=e158]
+          - heading "Immobilier Conakry & régions" [level=3] [ref=e162]
+          - paragraph [ref=e163]: Location, vente, terrains. Visite vidéo, distance au goudron, et offres en un tap.
+        - generic [ref=e164]:
+          - img [ref=e166]
+          - heading "Wallet intégré" [level=3] [ref=e169]
+          - paragraph [ref=e170]: Recharge en Orange Money, MTN ou carte. Paye, encaisse, retire — sans quitter l'app.
+        - generic [ref=e171]:
+          - img [ref=e173]
+          - heading "Escrow sécurisé" [level=3] [ref=e176]
+          - paragraph [ref=e177]: Le vendeur n'est payé qu'après ta confirmation de réception. Litige en 48 h.
+        - generic [ref=e178]:
+          - img [ref=e180]
+          - heading "Découvrir TikTok-style" [level=3] [ref=e183]
+          - paragraph [ref=e184]: Swipe verticalement entre annonces et logements. Le marché qui se feuillette.
+        - generic [ref=e185]:
+          - img [ref=e187]
+          - heading "KYC en 3 minutes" [level=3] [ref=e193]
+          - paragraph [ref=e194]: Pièce d'identité + selfie. Le badge "Vérifié" multiplie tes ventes par 3 en moyenne.
+    - generic [ref=e196]:
+      - generic [ref=e197]:
+        - generic [ref=e198]: Comment ça marche
+        - heading "3 étapes, peu importe le côté." [level=2] [ref=e199]
+      - generic [ref=e200]:
+        - button "Je suis acheteur" [ref=e201] [cursor=pointer]
+        - button "Je vends" [ref=e202] [cursor=pointer]
+      - generic [ref=e203]:
+        - generic [ref=e204]:
+          - generic [ref=e205]: "01"
+          - img [ref=e207]
+          - heading "Trouve ce qu'il te faut" [level=3] [ref=e210]
+          - paragraph [ref=e211]: Cherche un produit ou un logement, filtre par ville, prix, état.
+        - generic [ref=e212]:
+          - generic [ref=e213]: "02"
+          - img [ref=e215]
+          - heading "Paie en toute sécurité" [level=3] [ref=e217]
+          - paragraph [ref=e218]: Orange Money, MTN, carte bancaire ou wallet Linky. Escrow inclus.
+        - generic [ref=e219]:
+          - generic [ref=e220]: "03"
+          - img [ref=e222]
+          - heading "Reçois et confirme" [level=3] [ref=e227]
+          - paragraph [ref=e228]: Tu valides la réception. Le vendeur est payé. Sinon, on arbitre.
+    - generic [ref=e230]:
+      - generic [ref=e231]:
+        - generic [ref=e232]:
+          - img [ref=e233]
+          - generic [ref=e236]: Découvrir
+        - heading "Le marché qui se feuillette." [level=2] [ref=e237]
+        - paragraph [ref=e238]: Swipe verticalement entre des articles et des logements. Aime, sauvegarde, contacte. Un fil TikTok-style pensé pour le commerce.
+        - generic [ref=e239]:
+          - generic [ref=e240]:
+            - generic [ref=e241]: 1.2M
+            - generic [ref=e242]: Vues par mois
+          - generic [ref=e243]:
+            - generic [ref=e244]: 3×
+            - generic [ref=e245]: Engagement vs scroll classique
+          - generic [ref=e246]:
+            - generic [ref=e247]: +30 %
+            - generic [ref=e248]: Conversion pour les boutiques
+          - generic [ref=e249]:
+            - generic [ref=e250]: <2s
+            - generic [ref=e251]: Temps de chargement
+      - generic [ref=e254]:
+        - generic [ref=e257]:
+          - generic [ref=e258]: Tout
+          - generic [ref=e259]: Articles
+          - generic [ref=e260]: Immo
+        - generic [ref=e261]:
+          - generic [ref=e262]:
+            - img [ref=e264]
+            - generic [ref=e266]: 3.4k
+          - generic [ref=e267]:
+            - img [ref=e269]
+            - generic [ref=e271]: "128"
+          - generic [ref=e272]:
+            - img [ref=e274]
+            - generic [ref=e276]: "248"
+        - generic [ref=e277]:
+          - generic [ref=e278]:
+            - generic [ref=e280]:
+              - generic [ref=e281]:
+                - text: Maison Aïssatou
+                - img [ref=e283]
+              - generic [ref=e286]: ⭐ 4.9 · Vérifié
+            - generic [ref=e287]: Suivre
+          - generic [ref=e288]: Eau de parfum édition limitée
+          - generic [ref=e289]:
+            - generic [ref=e290]: 420 000
+            - generic [ref=e291]: GNF
+            - generic [ref=e292]: ≈ 38 €
+    - generic [ref=e296]:
+      - generic [ref=e298]:
+        - generic [ref=e299]:
+          - generic [ref=e300]:
+            - img [ref=e301]
+            - generic [ref=e303]: Pour la diaspora
+          - heading "Reste connecté au pays." [level=3] [ref=e304]
+        - generic [ref=e305]:
+          - generic [ref=e306]:
+            - generic [ref=e307]: +15k
+            - generic [ref=e308]: Diaspora utilisateurs
+          - generic [ref=e309]:
+            - generic [ref=e310]: "12"
+            - generic [ref=e311]: Pays supportés
+          - generic [ref=e312]:
+            - generic [ref=e313]: 24/7
+            - generic [ref=e314]: Support FR
+      - generic [ref=e315]:
+        - generic [ref=e316]: Diaspora
+        - heading "Depuis Paris, Bruxelles ou Washington — comme si tu étais à Conakry." [level=2] [ref=e317]
+        - generic [ref=e318]:
+          - generic [ref=e319]:
+            - img [ref=e321]
+            - generic [ref=e323]:
+              - heading "Paye en € depuis Paris ou Bruxelles" [level=3] [ref=e324]
+              - paragraph [ref=e325]: Carte bancaire acceptée. Conversion EUR → GNF transparente, sans frais cachés.
+          - generic [ref=e326]:
+            - img [ref=e328]
+            - generic [ref=e331]:
+              - heading "Envoie un cadeau à ta famille" [level=3] [ref=e332]
+              - paragraph [ref=e333]: Achète sur place, livré au quartier. Plus besoin de demander à quelqu'un de passer.
+          - generic [ref=e334]:
+            - img [ref=e336]
+            - generic [ref=e339]:
+              - heading "Prépare ton retour" [level=3] [ref=e340]
+              - paragraph [ref=e341]: Repère ton futur logement à Conakry, réserve une visite vidéo, fais ton offre depuis l'étranger.
+    - generic [ref=e343]:
+      - generic [ref=e344]:
+        - generic [ref=e345]: Confiance
+        - heading "Pourquoi des milliers de Guinéens nous confient leur argent." [level=2] [ref=e346]
+      - generic [ref=e347]:
+        - generic [ref=e348]:
+          - img [ref=e350]
+          - heading "Paiement en escrow" [level=3] [ref=e353]
+          - paragraph [ref=e354]: L'argent est gardé en séquestre tant que tu n'as pas validé la réception.
+        - generic [ref=e355]:
+          - img [ref=e357]
+          - heading "KYC obligatoire" [level=3] [ref=e360]
+          - paragraph [ref=e361]: Tout vendeur identifié et tout agent immobilier avec pièce d'identité vérifiée.
+        - generic [ref=e362]:
+          - img [ref=e364]
+          - heading "Litiges arbitrés en 48h" [level=3] [ref=e368]
+          - paragraph [ref=e369]: Une équipe de médiation locale tranche les désaccords, en français.
+        - generic [ref=e370]:
+          - img [ref=e372]
+          - heading "Données chiffrées" [level=3] [ref=e375]
+          - paragraph [ref=e376]: Conformité RGPD, données hébergées en datacenters certifiés ISO 27001.
+      - generic [ref=e377]:
+        - paragraph [ref=e378]: Partenaires de paiement
+        - generic [ref=e379]:
+          - generic [ref=e380]:
+            - generic [ref=e381]: OM
+            - generic [ref=e382]: Orange Money
+          - generic [ref=e383]:
+            - generic [ref=e384]: M
+            - generic [ref=e385]: MTN Mobile Money
+          - generic [ref=e386]:
+            - generic [ref=e387]: V
+            - generic [ref=e388]: Visa
+          - generic [ref=e389]:
+            - generic [ref=e390]: MC
+            - generic [ref=e391]: Mastercard
+          - generic [ref=e392]:
+            - generic [ref=e393]: S
+            - generic [ref=e394]: Stripe
+          - generic [ref=e395]:
+            - generic [ref=e396]: A
+            - generic [ref=e397]: Apple Pay
+    - generic [ref=e399]:
+      - generic [ref=e400]:
+        - generic [ref=e401]: Avis utilisateurs
+        - heading "Ils nous font confiance." [level=2] [ref=e402]
+      - generic [ref=e403]:
+        - generic [ref=e404]:
+          - generic [ref=e405]:
+            - img [ref=e406]
+            - img [ref=e408]
+            - img [ref=e410]
+            - img [ref=e412]
+            - img [ref=e414]
+          - paragraph [ref=e416]: « J'ai trouvé mon appartement à Lambanyi en 3 jours. La visite vidéo m'a évité de perdre du temps. Tout s'est passé via l'app, paiement compris. »
+          - generic [ref=e417]:
+            - generic [ref=e418]: MD
+            - generic [ref=e419]:
+              - generic [ref=e420]: Mariama Diallo
+              - generic [ref=e421]: Acheteuse · Conakry
+        - generic [ref=e422]:
+          - generic [ref=e423]:
+            - img [ref=e424]
+            - img [ref=e426]
+            - img [ref=e428]
+            - img [ref=e430]
+            - img [ref=e432]
+          - paragraph [ref=e434]: « Mes ventes ont triplé depuis que je suis sur Linky. Le badge "Vérifié" rassure les clientes, et les paiements arrivent vite sur mon Orange Money. »
+          - generic [ref=e435]:
+            - generic [ref=e436]: AB
+            - generic [ref=e437]:
+              - generic [ref=e438]: Aïssatou Bah
+              - generic [ref=e439]: Vendeuse · Maison Aïssatou
+        - generic [ref=e440]:
+          - generic [ref=e441]:
+            - img [ref=e442]
+            - img [ref=e444]
+            - img [ref=e446]
+            - img [ref=e448]
+            - img [ref=e450]
+          - paragraph [ref=e452]: « Je peux envoyer un cadeau à ma mère à Conakry sans déranger personne. Carte bancaire, paiement en €, livraison rapide. Bluffant. »
+          - generic [ref=e453]:
+            - generic [ref=e454]: IS
+            - generic [ref=e455]:
+              - generic [ref=e456]: Ibrahima Sow
+              - generic [ref=e457]: Diaspora · Paris
+    - generic [ref=e459]:
+      - generic [ref=e460]:
+        - generic [ref=e461]: Questions fréquentes
+        - heading "On répond aux essentiels." [level=2] [ref=e462]
+      - generic [ref=e463]:
+        - generic [ref=e464]:
+          - button "Comment fonctionne le paiement sécurisé ?" [ref=e465] [cursor=pointer]:
+            - generic [ref=e466]: Comment fonctionne le paiement sécurisé ?
+            - img [ref=e468]
+          - generic [ref=e469]: Quand tu achètes, ton paiement est gardé en escrow par Linky. Le vendeur n'est crédité qu'après ta confirmation de réception. Tu as 48 h pour confirmer ou ouvrir un litige.
+        - button "Quels moyens de paiement sont acceptés ?" [ref=e471] [cursor=pointer]:
+          - generic [ref=e472]: Quels moyens de paiement sont acceptés ?
+          - img [ref=e474]
+        - button "Combien coûtent les frais ?" [ref=e476] [cursor=pointer]:
+          - generic [ref=e477]: Combien coûtent les frais ?
+          - img [ref=e479]
+        - button "Que se passe-t-il en cas de problème avec un vendeur ?" [ref=e481] [cursor=pointer]:
+          - generic [ref=e482]: Que se passe-t-il en cas de problème avec un vendeur ?
+          - img [ref=e484]
+        - button "L'app est-elle disponible pour la diaspora ?" [ref=e486] [cursor=pointer]:
+          - generic [ref=e487]: L'app est-elle disponible pour la diaspora ?
+          - img [ref=e489]
+        - button "Comment devenir vendeur vérifié ?" [ref=e491] [cursor=pointer]:
+          - generic [ref=e492]: Comment devenir vendeur vérifié ?
+          - img [ref=e494]
+        - button "Linky est gratuit ?" [ref=e496] [cursor=pointer]:
+          - generic [ref=e497]: Linky est gratuit ?
+          - img [ref=e499]
+    - generic [ref=e503]:
+      - heading "Télécharge Linky. C'est gratuit." [level=2] [ref=e504]
+      - paragraph [ref=e505]: iOS et Android. Inscription en 1 minute, vérification en 3. Disponible en Guinée et pour la diaspora.
+      - generic [ref=e507]:
+        - link "Disponible sur App Store" [ref=e508] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e509]
+          - generic [ref=e512]:
+            - generic [ref=e513]: Disponible sur
+            - generic [ref=e514]: App Store
+        - link "Disponible sur Google Play" [ref=e515] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e516]
+          - generic [ref=e518]:
+            - generic [ref=e519]: Disponible sur
+            - generic [ref=e520]: Google Play
+      - generic [ref=e521]:
+        - generic [ref=e522]: ⭐ 4.8/5 sur l'App Store
+        - generic [ref=e523]: ·
+        - generic [ref=e524]: 15k+ téléchargements
+        - generic [ref=e525]: ·
+        - generic [ref=e526]: 100 % français
+    - generic [ref=e528]:
+      - generic [ref=e529]:
+        - generic [ref=e530]:
+          - generic [ref=e531]:
+            - img "Linky" [ref=e533]
+            - generic [ref=e534]: Linky
+          - paragraph [ref=e535]: Le marché et l'immobilier en Guinée, dans une seule app. Construit avec amour à Conakry.
+          - generic [ref=e536]:
+            - link [ref=e537] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e538]
+            - link [ref=e541] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e542]
+            - link [ref=e545] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e546]
+            - link [ref=e549] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e550]
+        - generic [ref=e552]:
+          - generic [ref=e553]:
+            - heading "Produit" [level=4] [ref=e554]
+            - list [ref=e555]:
+              - listitem [ref=e556]:
+                - link "Comment ça marche" [ref=e557] [cursor=pointer]:
+                  - /url: "#comment"
+              - listitem [ref=e558]:
+                - link "Découvrir" [ref=e559] [cursor=pointer]:
+                  - /url: "#decouvrir"
+              - listitem [ref=e560]:
+                - link "Pour la diaspora" [ref=e561] [cursor=pointer]:
+                  - /url: "#diaspora"
+              - listitem [ref=e562]:
+                - link "FAQ" [ref=e563] [cursor=pointer]:
+                  - /url: "#faq"
+          - generic [ref=e564]:
+            - heading "Entreprise" [level=4] [ref=e565]
+            - list [ref=e566]:
+              - listitem [ref=e567]:
+                - link "À propos" [ref=e568] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e569]:
+                - link "Blog" [ref=e570] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e571]:
+                - link "Carrières" [ref=e572] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e573]:
+                - link "Presse" [ref=e574] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e575]:
+            - heading "Support" [level=4] [ref=e576]
+            - list [ref=e577]:
+              - listitem [ref=e578]:
+                - link "Centre d'aide" [ref=e579] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e580]:
+                - link "Contact" [ref=e581] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e582]:
+                - link "Statut" [ref=e583] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e584]:
+                - link "Sécurité" [ref=e585] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e586]:
+            - heading "Légal" [level=4] [ref=e587]
+            - list [ref=e588]:
+              - listitem [ref=e589]:
+                - link "Conditions générales" [ref=e590] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e591]:
+                - link "Politique de confidentialité" [ref=e592] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e593]:
+                - link "Mentions légales" [ref=e594] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e595]:
+                - link "Cookies" [ref=e596] [cursor=pointer]:
+                  - /url: "#"
+      - generic [ref=e597]:
+        - generic [ref=e598]: © 2026 Linky SAS. Tous droits réservés.
+        - generic [ref=e599]:
+          - generic [ref=e600]: Fait avec
+          - generic [ref=e601]: ♥
+          - generic [ref=e602]: à Conakry.
+  - button "Open Next.js Dev Tools" [ref=e608] [cursor=pointer]:
+    - img [ref=e609]

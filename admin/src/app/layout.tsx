@@ -38,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${inter.variable} ${grotesk.variable}`}>
-      <body className="min-h-screen bg-bg-sunken text-text font-sans antialiased">
+      <body className="min-h-screen bg-sunken text-[#0E1311] font-sans antialiased">
         <QueryProvider>{children}</QueryProvider>
         <Toaster richColors position="bottom-right" closeButton />
       </body>

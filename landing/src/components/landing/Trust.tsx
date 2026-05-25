@@ -42,24 +42,24 @@ function PartnerLogo({ name }: { name: string }) {
   };
   const m = map[name] ?? { bg: '#0E1311', fg: '#fff', abbr: '?' };
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-border bg-bg-elev px-5 py-3">
+    <div className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-5 py-3">
       <div
         className="flex h-9 w-9 items-center justify-center rounded-lg font-bold"
         style={{ background: m.bg, color: m.fg }}
       >
         {m.abbr}
       </div>
-      <span className="text-sm font-bold text-text">{name}</span>
+      <span className="text-sm font-bold text-[#0E1311]">{name}</span>
     </div>
   );
 }
 
 export function Trust() {
   return (
-    <section className="bg-bg-elev py-20 md:py-28">
+    <section className="bg-surface py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="mx-auto max-w-2xl text-center">
-          <div className="inline-flex items-center rounded-full border border-border bg-bg px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-text-muted">
+          <div className="inline-flex items-center rounded-full border border-line bg-[#F7F3EC] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-muted">
             Confiance
           </div>
           <h2 className="font-display mt-5 text-4xl font-bold leading-[1.1] tracking-tight md:text-5xl">
@@ -71,7 +71,7 @@ export function Trust() {
           {PILLARS.map((p) => (
             <div
               key={p.title}
-              className="rounded-3xl border border-border bg-card p-7"
+              className="rounded-3xl border border-line bg-card p-7"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-soft">
                 <p.Icon size={22} className="text-primary" strokeWidth={1.75} />
@@ -79,7 +79,7 @@ export function Trust() {
               <h3 className="font-display mt-5 text-lg font-bold tracking-tight">
                 {p.title}
               </h3>
-              <p className="mt-2.5 text-sm leading-relaxed text-text-muted">
+              <p className="mt-2.5 text-sm leading-relaxed text-muted">
                 {p.body}
               </p>
             </div>
@@ -88,7 +88,7 @@ export function Trust() {
 
         {/* Partners */}
         <div className="mt-20">
-          <p className="text-center text-xs font-bold uppercase tracking-wider text-text-faint">
+          <p className="text-center text-xs font-bold uppercase tracking-wider text-faint">
             Partenaires de paiement
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">

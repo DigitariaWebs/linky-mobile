@@ -61,7 +61,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${inter.variable} ${grotesk.variable}`}>
-      <body className="min-h-screen bg-bg text-text font-sans antialiased">
+      <body className="min-h-screen bg-[#F7F3EC] text-[#0E1311] font-sans antialiased">
         {children}
       </body>
     </html>

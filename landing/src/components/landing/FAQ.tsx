@@ -40,7 +40,7 @@ export function FAQ() {
     <section id="faq" className="py-20 md:py-28">
       <div className="mx-auto max-w-3xl px-6 lg:px-10">
         <div className="text-center">
-          <div className="inline-flex items-center rounded-full border border-border bg-bg-elev px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-text-muted">
+          <div className="inline-flex items-center rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-muted">
             Questions fréquentes
           </div>
           <h2 className="font-display mt-5 text-4xl font-bold tracking-tight md:text-5xl">
@@ -48,19 +48,19 @@ export function FAQ() {
           </h2>
         </div>
 
-        <div className="mt-12 divide-y divide-border rounded-3xl border border-border bg-card">
+        <div className="mt-12 divide-y divide-border rounded-3xl border border-line bg-card">
           {FAQS.map((f, i) => {
             const isOpen = open === i;
             return (
               <div key={f.q}>
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
-                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-bg-sunken/40"
+                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-sunken/40"
                 >
                   <span className="font-display text-base font-bold tracking-tight md:text-lg">
                     {f.q}
                   </span>
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-bg-elev">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line bg-surface">
                     {isOpen ? (
                       <Minus size={15} strokeWidth={2.25} />
                     ) : (
@@ -69,7 +69,7 @@ export function FAQ() {
                   </div>
                 </button>
                 {isOpen && (
-                  <div className="px-6 pb-6 text-[15px] leading-relaxed text-text-muted">
+                  <div className="px-6 pb-6 text-[15px] leading-relaxed text-muted">
                     {f.a}
                   </div>
                 )}

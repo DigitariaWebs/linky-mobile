@@ -7,7 +7,7 @@ import { DisputesKanban } from './DisputesKanban';
 import { ordersData, type Order, type OrderStatus } from '@/data/mock';
 
 const STATUS_META: Record<OrderStatus, { label: string; cls: string }> = {
-  placed: { label: 'PASSÉE', cls: 'bg-bg-sunken text-text-muted' },
+  placed: { label: 'PASSÉE', cls: 'bg-sunken text-muted' },
   paid: { label: 'PAYÉE', cls: 'bg-accent-soft text-accent-text' },
   preparing: { label: 'EN COURS', cls: 'bg-accent-soft text-accent-text' },
   delivered: { label: 'LIVRÉE', cls: 'bg-primary-soft text-primary-deep' },
@@ -76,7 +76,7 @@ export function OrdersModule() {
   const [tab, setTab] = useState<'kanban' | 'table'>('kanban');
   return (
     <div className="space-y-6">
-      <div className="flex w-fit gap-1 rounded-full bg-bg-elev p-1.5 ring-1 ring-border">
+      <div className="flex w-fit gap-1 rounded-full bg-surface p-1.5 ring-1 ring-border">
         <TabBtn label="Kanban litiges" active={tab === 'kanban'} onClick={() => setTab('kanban')} />
         <TabBtn
           label="Table commandes"
@@ -112,7 +112,7 @@ function TabBtn({
     <button
       onClick={onClick}
       className={`rounded-full px-5 py-2 text-sm font-bold transition-all ${
-        active ? 'bg-text text-bg' : 'text-text-muted hover:text-text'
+        active ? 'bg-black text-white' : 'text-muted hover:text-[#0E1311]'
       }`}
     >
       {label}

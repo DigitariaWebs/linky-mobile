@@ -9,7 +9,7 @@ const STATUS_META: Record<ListingStatus, { label: string; cls: string }> = {
   live: { label: 'En ligne', cls: 'bg-success/12 text-success' },
   pending: { label: 'En attente', cls: 'bg-accent-soft text-accent-text' },
   flagged: { label: 'Signalée', cls: 'bg-danger/12 text-danger' },
-  paused: { label: 'Pause', cls: 'bg-bg-sunken text-text-muted' },
+  paused: { label: 'Pause', cls: 'bg-sunken text-muted' },
   rejected: { label: 'Refusée', cls: 'bg-danger/12 text-danger' },
 };
 
@@ -21,12 +21,12 @@ const columns: ColumnDef<Listing>[] = [
       const l = row.original;
       return (
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-bg-sunken text-[10px] font-bold uppercase text-text-muted">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sunken text-[10px] font-bold uppercase text-muted">
             {l.kind === 'product' ? 'PR' : 'IM'}
           </div>
           <div className="min-w-0">
             <div className="truncate font-bold">{l.title}</div>
-            <div className="text-xs text-text-muted">
+            <div className="text-xs text-muted">
               {l.ref} · {l.category}
             </div>
           </div>
@@ -55,7 +55,7 @@ const columns: ColumnDef<Listing>[] = [
     accessorKey: 'views',
     header: 'Vues',
     cell: ({ row }) => (
-      <span className="tabular-nums text-text-muted">
+      <span className="tabular-nums text-muted">
         {row.original.views.toLocaleString('fr-FR')}
       </span>
     ),
@@ -111,8 +111,8 @@ function IconButton({
   return (
     <button
       title={title}
-      className={`flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:bg-bg-sunken ${
-        danger ? 'hover:text-danger' : 'hover:text-text'
+      className={`flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:bg-sunken ${
+        danger ? 'hover:text-danger' : 'hover:text-[#0E1311]'
       }`}
     >
       {children}

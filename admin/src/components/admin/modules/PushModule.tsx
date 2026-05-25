@@ -44,8 +44,8 @@ export function PushModule() {
   return (
     <div className="grid gap-6 xl:grid-cols-[1.2fr_1fr]">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        <div className="rounded-2xl border border-border bg-bg-elev p-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-text-faint">
+        <div className="rounded-2xl border border-line bg-surface p-6">
+          <div className="text-xs font-bold uppercase tracking-wider text-faint">
             Nouvelle notification
           </div>
 
@@ -54,9 +54,9 @@ export function PushModule() {
               <input
                 {...register('title')}
                 maxLength={60}
-                className="h-12 w-full rounded-xl border border-border bg-bg-elev px-4 text-sm font-semibold outline-none focus:border-primary"
+                className="h-12 w-full rounded-xl border border-line bg-surface px-4 text-sm font-semibold outline-none focus:border-primary"
               />
-              <div className="mt-1 text-right text-[10px] text-text-faint tabular-nums">
+              <div className="mt-1 text-right text-[10px] text-faint tabular-nums">
                 {values.title?.length ?? 0}/60
               </div>
             </Field>
@@ -66,9 +66,9 @@ export function PushModule() {
                 {...register('body')}
                 rows={3}
                 maxLength={160}
-                className="w-full resize-none rounded-xl border border-border bg-bg-elev px-4 py-3 text-sm outline-none focus:border-primary"
+                className="w-full resize-none rounded-xl border border-line bg-surface px-4 py-3 text-sm outline-none focus:border-primary"
               />
-              <div className="mt-1 text-right text-[10px] text-text-faint tabular-nums">
+              <div className="mt-1 text-right text-[10px] text-faint tabular-nums">
                 {values.body?.length ?? 0}/160
               </div>
             </Field>
@@ -77,7 +77,7 @@ export function PushModule() {
               <Field label="Audience" error={errors.audience?.message}>
                 <select
                   {...register('audience')}
-                  className="h-12 w-full rounded-xl border border-border bg-bg-elev px-4 text-sm font-semibold outline-none focus:border-primary"
+                  className="h-12 w-full rounded-xl border border-line bg-surface px-4 text-sm font-semibold outline-none focus:border-primary"
                 >
                   <option value="all">Tous (18 420)</option>
                   <option value="buyers">Acheteurs (12 850)</option>
@@ -89,7 +89,7 @@ export function PushModule() {
                 <input
                   type="datetime-local"
                   {...register('scheduled')}
-                  className="h-12 w-full rounded-xl border border-border bg-bg-elev px-4 text-sm font-semibold outline-none focus:border-primary"
+                  className="h-12 w-full rounded-xl border border-line bg-surface px-4 text-sm font-semibold outline-none focus:border-primary"
                 />
               </Field>
             </div>
@@ -97,7 +97,7 @@ export function PushModule() {
             <div className="flex gap-3">
               <button
                 type="submit"
-                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-text text-sm font-bold text-bg hover:opacity-90"
+                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-black text-sm font-bold text-white hover:opacity-90"
               >
                 {values.scheduled ? (
                   <>
@@ -114,8 +114,8 @@ export function PushModule() {
         </div>
 
         {/* Recent */}
-        <div className="rounded-2xl border border-border bg-bg-elev p-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-text-faint">
+        <div className="rounded-2xl border border-line bg-surface p-6">
+          <div className="text-xs font-bold uppercase tracking-wider text-faint">
             Campagnes récentes
           </div>
           <div className="mt-4 space-y-3">
@@ -124,14 +124,14 @@ export function PushModule() {
               return (
                 <div
                   key={p.id}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-bg-sunken/40 p-3"
+                  className="flex items-center gap-3 rounded-xl border border-line bg-sunken/40 p-3"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-soft text-primary">
                     <Bell size={16} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-bold">{p.title}</div>
-                    <div className="text-xs text-text-muted">
+                    <div className="text-xs text-muted">
                       {sent
                         ? `${p.sent} envoyées · ${p.opened} ouvertes (${
                             p.opened && p.sent
@@ -159,8 +159,8 @@ export function PushModule() {
 
       {/* Phone preview */}
       <div className="sticky top-0">
-        <div className="rounded-2xl border border-border bg-bg-elev p-6">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-faint">
+        <div className="rounded-2xl border border-line bg-surface p-6">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-faint">
             <Smartphone size={13} />
             Aperçu sur l&apos;écran verrouillé
           </div>
@@ -183,18 +183,18 @@ export function PushModule() {
                       <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-md bg-primary">
                         <span className="text-[10px] font-bold text-white">L</span>
                       </div>
-                      <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted">
                         Linky
                       </span>
                       <div className="flex-1" />
-                      <span className="text-[10px] text-text-muted">
+                      <span className="text-[10px] text-muted">
                         maintenant
                       </span>
                     </div>
                     <div className="mt-2 text-sm font-bold leading-tight">
                       {values.title || 'Titre…'}
                     </div>
-                    <div className="mt-1 text-xs leading-snug text-text-muted">
+                    <div className="mt-1 text-xs leading-snug text-muted">
                       {values.body || 'Contenu de la notification…'}
                     </div>
                   </div>
@@ -232,7 +232,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="text-[11px] font-bold uppercase tracking-wider text-text-faint">
+      <label className="text-[11px] font-bold uppercase tracking-wider text-faint">
         {label}
       </label>
       <div className="mt-2">{children}</div>

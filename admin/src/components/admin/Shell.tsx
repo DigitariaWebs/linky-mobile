@@ -27,14 +27,14 @@ export function Shell({
 
   if (!session) {
     return (
-      <div className="grid min-h-screen place-items-center bg-bg-sunken">
-        <div className="text-sm text-text-muted">Redirection…</div>
+      <div className="grid min-h-screen place-items-center bg-sunken">
+        <div className="text-sm text-muted">Redirection…</div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-bg-sunken">
+    <div className="flex h-screen overflow-hidden bg-sunken">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar title={title} subtitle={subtitle} />

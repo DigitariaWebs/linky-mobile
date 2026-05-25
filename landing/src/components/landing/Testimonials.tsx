@@ -41,7 +41,7 @@ export function Testimonials() {
     <section className="py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="mx-auto max-w-2xl text-center">
-          <div className="inline-flex items-center rounded-full border border-border bg-bg-elev px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-text-muted">
+          <div className="inline-flex items-center rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-muted">
             Avis utilisateurs
           </div>
           <h2 className="font-display mt-5 text-4xl font-bold tracking-tight md:text-5xl">
@@ -53,7 +53,7 @@ export function Testimonials() {
           {QUOTES.map((q) => (
             <div
               key={q.name}
-              className="rounded-3xl border border-border bg-card p-7"
+              className="rounded-3xl border border-line bg-card p-7"
             >
               <div className="flex gap-1">
                 {Array.from({ length: q.rating }).map((_, i) => (
@@ -66,19 +66,19 @@ export function Testimonials() {
                   />
                 ))}
               </div>
-              <p className="mt-5 text-[15px] leading-relaxed text-text">
+              <p className="mt-5 text-[15px] leading-relaxed text-[#0E1311]">
                 « {q.text} »
               </p>
-              <div className="mt-6 flex items-center gap-3 border-t border-border pt-5">
+              <div className="mt-6 flex items-center gap-3 border-t border-line pt-5">
                 <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full font-bold text-text"
+                  className="flex h-10 w-10 items-center justify-center rounded-full font-bold text-[#0E1311]"
                   style={{ background: q.tint }}
                 >
                   {q.initials}
                 </div>
                 <div>
                   <div className="text-sm font-bold">{q.name}</div>
-                  <div className="text-xs text-text-muted">{q.role}</div>
+                  <div className="text-xs text-muted">{q.role}</div>
                 </div>
               </div>
             </div>

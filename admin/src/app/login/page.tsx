@@ -55,7 +55,7 @@ export default function LoginPage() {
                 <h1 className="font-display mt-5 text-4xl font-bold leading-tight tracking-tight">
                   Bienvenue.
                 </h1>
-                <p className="mt-3 text-text-muted">
+                <p className="mt-3 text-muted">
                   Connecte-toi à ton back-office. Authentification 2FA
                   obligatoire.
                 </p>
@@ -80,7 +80,7 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={!email}
-                    className="mt-2 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-text text-base font-bold text-bg transition-opacity hover:opacity-90 disabled:opacity-40"
+                    className="mt-2 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-black text-base font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
                   >
                     Continuer
                     <ArrowRight size={16} />
@@ -96,7 +96,7 @@ export default function LoginPage() {
                 <h1 className="font-display mt-5 text-4xl font-bold leading-tight tracking-tight">
                   Code à 6 chiffres
                 </h1>
-                <p className="mt-3 text-text-muted">
+                <p className="mt-3 text-muted">
                   Saisis le code envoyé à <strong>{email}</strong>.
                 </p>
 
@@ -109,19 +109,19 @@ export default function LoginPage() {
                       setCode(e.target.value.replace(/\D/g, '').slice(0, 6))
                     }
                     placeholder="••••••"
-                    className="h-20 w-full rounded-2xl border border-border bg-bg-elev text-center text-3xl font-bold tracking-[12px] outline-none focus:border-primary"
+                    className="h-20 w-full rounded-2xl border border-line bg-surface text-center text-3xl font-bold tracking-[12px] outline-none focus:border-primary"
                   />
                   <button
                     type="submit"
                     disabled={code.length !== 6}
-                    className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-text text-base font-bold text-bg transition-opacity hover:opacity-90 disabled:opacity-40"
+                    className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-black text-base font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
                   >
                     Se connecter
                   </button>
                   <button
                     type="button"
                     onClick={() => setStep('creds')}
-                    className="flex h-12 w-full items-center justify-center text-sm font-semibold text-text-muted"
+                    className="flex h-12 w-full items-center justify-center text-sm font-semibold text-muted"
                   >
                     ← Changer d&apos;email
                   </button>
@@ -130,7 +130,7 @@ export default function LoginPage() {
             )}
           </div>
 
-          <p className="mt-12 text-xs text-text-faint">
+          <p className="mt-12 text-xs text-faint">
             Toute connexion est journalisée. Accès limité au personnel Linky
             autorisé.
           </p>
@@ -192,17 +192,17 @@ function Field({
 }) {
   return (
     <div>
-      <label className="text-[11px] font-bold uppercase tracking-wider text-text-faint">
+      <label className="text-[11px] font-bold uppercase tracking-wider text-faint">
         {label}
       </label>
-      <div className="mt-2 flex h-14 items-center gap-3 rounded-2xl border border-border bg-bg-elev px-4 focus-within:border-primary">
-        <Icon size={18} className="text-text-muted" strokeWidth={1.75} />
+      <div className="mt-2 flex h-14 items-center gap-3 rounded-2xl border border-line bg-surface px-4 focus-within:border-primary">
+        <Icon size={18} className="text-muted" strokeWidth={1.75} />
         <input
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="flex-1 bg-transparent text-base font-medium outline-none placeholder:text-text-faint"
+          className="flex-1 bg-transparent text-base font-medium outline-none placeholder:text-faint"
         />
       </div>
     </div>

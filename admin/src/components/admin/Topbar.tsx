@@ -14,7 +14,7 @@ export function Topbar({
   const env = session?.env ?? 'staging';
 
   return (
-    <header className="flex h-20 shrink-0 items-center justify-between gap-6 border-b border-border bg-bg-elev px-8">
+    <header className="flex h-20 shrink-0 items-center justify-between gap-6 border-b border-line bg-surface px-8">
       <div>
         <div className="flex items-center gap-2">
           <h1 className="font-display text-2xl font-bold tracking-tight">
@@ -32,20 +32,20 @@ export function Topbar({
           </span>
         </div>
         {subtitle && (
-          <p className="mt-1 text-sm text-text-muted">{subtitle}</p>
+          <p className="mt-1 text-sm text-muted">{subtitle}</p>
         )}
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="hidden h-10 items-center gap-2 rounded-full border border-border bg-bg-sunken px-4 md:flex md:w-72">
-          <Search size={15} className="text-text-muted" />
+        <div className="hidden h-10 items-center gap-2 rounded-full border border-line bg-sunken px-4 md:flex md:w-72">
+          <Search size={15} className="text-muted" />
           <input
             placeholder="Rechercher utilisateur, commande, annonce…"
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-text-faint"
+            className="flex-1 bg-transparent text-sm outline-none placeholder:text-faint"
           />
-          <kbd className="text-[10px] font-bold text-text-faint">⌘K</kbd>
+          <kbd className="text-[10px] font-bold text-faint">⌘K</kbd>
         </div>
-        <button className="relative flex h-10 w-10 items-center justify-center rounded-full border border-border bg-bg-sunken">
+        <button className="relative flex h-10 w-10 items-center justify-center rounded-full border border-line bg-sunken">
           <Bell size={16} />
           <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-danger ring-2 ring-bg-elev" />
         </button>

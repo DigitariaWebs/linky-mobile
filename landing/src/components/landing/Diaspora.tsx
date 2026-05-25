@@ -77,7 +77,7 @@ export function Diaspora() {
 
           {/* Right: features */}
           <div>
-            <div className="inline-flex items-center rounded-full border border-border bg-bg-elev px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-text-muted">
+            <div className="inline-flex items-center rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-muted">
               Diaspora
             </div>
             <h2 className="font-display mt-5 text-4xl font-bold leading-[1.1] tracking-tight md:text-5xl">
@@ -101,7 +101,7 @@ export function Diaspora() {
                     <h3 className="font-display text-lg font-bold tracking-tight">
                       {u.title}
                     </h3>
-                    <p className="mt-1.5 text-[15px] leading-relaxed text-text-muted">
+                    <p className="mt-1.5 text-[15px] leading-relaxed text-muted">
                       {u.body}
                     </p>
                   </div>

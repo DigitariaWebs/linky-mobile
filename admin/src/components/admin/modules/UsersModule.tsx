@@ -20,7 +20,7 @@ const columns: ColumnDef<User>[] = [
       const u = row.original;
       return (
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-sunken text-xs font-bold">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sunken text-xs font-bold">
             {u.name
               .split(' ')
               .map((p) => p[0])
@@ -30,7 +30,7 @@ const columns: ColumnDef<User>[] = [
           </div>
           <div>
             <div className="font-bold">{u.name}</div>
-            <div className="text-xs text-text-muted">{u.email}</div>
+            <div className="text-xs text-muted">{u.email}</div>
           </div>
         </div>
       );
@@ -44,7 +44,7 @@ const columns: ColumnDef<User>[] = [
         {row.original.roles.map((r) => (
           <span
             key={r}
-            className="rounded-full bg-bg-sunken px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-text-muted"
+            className="rounded-full bg-sunken px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted"
           >
             {r}
           </span>
@@ -113,8 +113,8 @@ function IconButton({
   return (
     <button
       title={title}
-      className={`flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:bg-bg-sunken ${
-        danger ? 'hover:text-danger' : 'hover:text-text'
+      className={`flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:bg-sunken ${
+        danger ? 'hover:text-danger' : 'hover:text-[#0E1311]'
       }`}
     >
       {children}

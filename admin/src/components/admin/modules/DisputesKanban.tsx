@@ -88,7 +88,7 @@ function Column({
   return (
     <div
       ref={setNodeRef}
-      className={`flex h-full min-h-[480px] flex-col gap-3 rounded-2xl border border-border bg-bg-elev p-4 transition-colors ${
+      className={`flex h-full min-h-[480px] flex-col gap-3 rounded-2xl border border-line bg-surface p-4 transition-colors ${
         isOver ? 'ring-2 ring-primary' : ''
       }`}
     >
@@ -102,7 +102,7 @@ function Column({
           </div>
           <h3 className="text-sm font-bold tracking-tight">{title}</h3>
         </div>
-        <span className="rounded-full bg-bg-sunken px-2 py-0.5 text-[11px] font-bold tabular-nums text-text-muted">
+        <span className="rounded-full bg-sunken px-2 py-0.5 text-[11px] font-bold tabular-nums text-muted">
           {items.length}
         </span>
       </div>
@@ -127,24 +127,24 @@ function DisputeCard({ d }: { d: Dispute }) {
         zIndex: isDragging ? 50 : undefined,
         opacity: isDragging ? 0.85 : 1,
       }}
-      className={`cursor-grab rounded-xl border border-border bg-bg-sunken/40 p-3.5 active:cursor-grabbing ${
+      className={`cursor-grab rounded-xl border border-line bg-sunken/40 p-3.5 active:cursor-grabbing ${
         isDragging ? 'shadow-[var(--shadow-pop)]' : ''
       }`}
     >
       <div className="flex items-center justify-between">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-text-faint">
+        <div className="text-[11px] font-bold uppercase tracking-wider text-faint">
           {d.orderRef}
         </div>
-        <div className="text-[11px] text-text-faint">{d.ago}</div>
+        <div className="text-[11px] text-faint">{d.ago}</div>
       </div>
       <div className="mt-2 line-clamp-2 text-sm font-bold leading-snug">
         {d.reason}
       </div>
-      <div className="mt-2.5 text-xs text-text-muted">
-        {d.buyer} <span className="text-text-faint">vs</span> {d.seller}
+      <div className="mt-2.5 text-xs text-muted">
+        {d.buyer} <span className="text-faint">vs</span> {d.seller}
       </div>
       <div className="mt-2.5 flex items-center justify-between">
-        <span className="rounded-md bg-bg-elev px-2 py-0.5 text-xs font-bold tabular-nums">
+        <span className="rounded-md bg-surface px-2 py-0.5 text-xs font-bold tabular-nums">
           {(d.amountGnf / 1000).toLocaleString('fr-FR')} k GNF
         </span>
       </div>

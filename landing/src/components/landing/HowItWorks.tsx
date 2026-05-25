@@ -64,7 +64,7 @@ export function HowItWorks() {
     <section className="py-20 md:py-28" id="how">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="mx-auto max-w-2xl text-center">
-          <div className="inline-flex items-center rounded-full border border-border bg-bg-elev px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-text-muted">
+          <div className="inline-flex items-center rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-muted">
             Comment ça marche
           </div>
           <h2 className="font-display mt-5 text-4xl font-bold tracking-tight md:text-5xl">
@@ -73,7 +73,7 @@ export function HowItWorks() {
         </div>
 
         {/* Audience switcher */}
-        <div className="mx-auto mt-10 flex w-fit gap-1 rounded-full bg-bg-elev p-1.5 ring-1 ring-border">
+        <div className="mx-auto mt-10 flex w-fit gap-1 rounded-full bg-surface p-1.5 ring-1 ring-border">
           {(['buyer', 'seller'] as const).map((a) => {
             const active = audience === a;
             return (
@@ -82,8 +82,8 @@ export function HowItWorks() {
                 onClick={() => setAudience(a)}
                 className={`rounded-full px-6 py-2.5 text-sm font-bold transition-all ${
                   active
-                    ? 'bg-text text-bg'
-                    : 'text-text-muted hover:text-text'
+                    ? 'bg-black text-white'
+                    : 'text-muted hover:text-[#0E1311]'
                 }`}
               >
                 {a === 'buyer' ? 'Je suis acheteur' : 'Je vends'}
@@ -105,7 +105,7 @@ export function HowItWorks() {
               <h3 className="font-display mt-6 text-xl font-bold tracking-tight">
                 {s.title}
               </h3>
-              <p className="mt-3 text-[15px] leading-relaxed text-text-muted">
+              <p className="mt-3 text-[15px] leading-relaxed text-muted">
                 {s.body}
               </p>
             </div>

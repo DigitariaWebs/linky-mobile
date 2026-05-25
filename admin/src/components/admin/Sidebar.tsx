@@ -49,7 +49,7 @@ export function Sidebar() {
   const signOut = useAuth((s) => s.signOut);
 
   return (
-    <aside className="hidden h-screen w-72 shrink-0 flex-col border-r border-border bg-bg-elev px-4 py-5 lg:flex">
+    <aside className="hidden h-screen w-72 shrink-0 flex-col border-r border-line bg-surface px-4 py-5 lg:flex">
       <div className="flex items-center gap-2.5 px-3 pb-5">
         <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-primary">
           <Image
@@ -62,7 +62,7 @@ export function Sidebar() {
         </div>
         <div>
           <div className="font-display text-base font-bold">Linky</div>
-          <div className="text-[10px] font-bold uppercase tracking-wider text-text-faint">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-faint">
             Admin
           </div>
         </div>
@@ -71,7 +71,7 @@ export function Sidebar() {
       <nav className="flex-1 space-y-5 overflow-y-auto">
         {NAV.map((sec) => (
           <div key={sec.section}>
-            <div className="px-3 text-[10px] font-bold uppercase tracking-[1px] text-text-faint">
+            <div className="px-3 text-[10px] font-bold uppercase tracking-[1px] text-faint">
               {sec.section}
             </div>
             <div className="mt-2 space-y-0.5">
@@ -85,7 +85,7 @@ export function Sidebar() {
                     className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                       active
                         ? 'bg-primary-soft text-primary-deep'
-                        : 'text-text-muted hover:bg-bg-sunken hover:text-text'
+                        : 'text-muted hover:bg-sunken hover:text-[#0E1311]'
                     }`}
                   >
                     <it.Icon size={16} strokeWidth={1.75} />
@@ -110,30 +110,30 @@ export function Sidebar() {
       </nav>
 
       {/* Footer: user + sign out */}
-      <div className="mt-5 border-t border-border pt-4">
+      <div className="mt-5 border-t border-line pt-4">
         <div className="flex items-center gap-3 px-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-sunken text-sm font-bold text-text">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sunken text-sm font-bold text-[#0E1311]">
             {(session?.name ?? 'A').slice(0, 2).toUpperCase()}
           </div>
           <div className="flex-1 overflow-hidden">
-            <div className="truncate text-sm font-bold text-text">
+            <div className="truncate text-sm font-bold text-[#0E1311]">
               {session?.name ?? 'Admin'}
             </div>
-            <div className="truncate text-[11px] text-text-muted">
+            <div className="truncate text-[11px] text-muted">
               {session?.email ?? '—'}
             </div>
           </div>
           <button
             onClick={signOut}
             title="Se déconnecter"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:bg-bg-sunken hover:text-danger"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:bg-sunken hover:text-danger"
           >
             <LogOut size={15} />
           </button>
         </div>
         <Link
           href="/settings"
-          className="mt-3 flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-text-muted hover:bg-bg-sunken"
+          className="mt-3 flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-muted hover:bg-sunken"
         >
           <Settings size={13} />
           Paramètres
