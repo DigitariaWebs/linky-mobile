@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { storage, STORAGE_KEYS } from '../lib/storage';
+import { storage, STORAGE_KEYS, secure, SECURE_KEYS } from '../lib/storage';
 import { CURRENT_USER_ID, getUser } from '../data/mockUsers';
 import type { User } from '../data/types';
 
@@ -17,12 +17,19 @@ interface AuthState {
   isOnboarded: boolean;
   channel: AuthChannel;
   pendingPhone: string;
+  pendingOtpId: string | null;
+  // DEV-ONLY: the OTP code echoed by otp-request in stub mode, so otp.tsx can auto-fill
+  // and the tester never reads server logs. Never populated when a real provider is wired.
+  pendingDevCode: string | null;
   roles: UserRole[];
   setChannel: (c: AuthChannel) => void;
   setPendingPhone: (p: string) => void;
+  setPendingOtpId: (id: string | null) => void;
+  setPendingDevCode: (code: string | null) => void;
   setRoles: (r: UserRole[]) => void;
+  setTokens: (access: string, refresh: string) => Promise<void>;
   signIn: (userId?: string) => void;
-  signOut: () => void;
+  signOut: () => Promise<void>;
   completeOnboarding: (roles?: UserRole[]) => void;
 }
 
@@ -50,22 +57,33 @@ export const useAuth = create<AuthState>((set) => ({
   isOnboarded: initialDone,
   channel: 'phone',
   pendingPhone: '+224 622 55 12 88',
+  pendingOtpId: null,
+  pendingDevCode: null,
   roles: loadRoles(),
   setChannel: (channel) => set({ channel }),
   setPendingPhone: (pendingPhone) => set({ pendingPhone }),
+  setPendingOtpId: (pendingOtpId) => set({ pendingOtpId }),
+  setPendingDevCode: (pendingDevCode) => set({ pendingDevCode }),
   setRoles: (roles) => {
     saveRoles(roles);
     set({ roles });
+  },
+  setTokens: async (access, refresh) => {
+    await secure.set(SECURE_KEYS.authToken, access);
+    await secure.set(SECURE_KEYS.refreshToken, refresh);
   },
   signIn: (userId = CURRENT_USER_ID) => {
     const user = getUser(userId) ?? null;
     storage.set(STORAGE_KEYS.currentUserId, userId);
     set({ user });
   },
-  signOut: () => {
+  signOut: async () => {
+    // V1: clears local credentials only. TODO(task #12): hit /v1/session/revoke once that endpoint exists.
+    await secure.remove(SECURE_KEYS.authToken);
+    await secure.remove(SECURE_KEYS.refreshToken);
     storage.remove(STORAGE_KEYS.currentUserId);
     storage.set(STORAGE_KEYS.onboardingDone, false);
-    set({ user: null, isOnboarded: false });
+    set({ user: null, isOnboarded: false, pendingOtpId: null, pendingDevCode: null });
   },
   completeOnboarding: (roles) => {
     storage.set(STORAGE_KEYS.onboardingDone, true);

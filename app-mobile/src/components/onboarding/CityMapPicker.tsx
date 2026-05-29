@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, Pressable, ScrollView, View } from 'react-native';
-import { AppleMaps, GoogleMaps } from 'expo-maps';
+import Mapbox, { MapView, Camera, PointAnnotation } from '@rnmapbox/maps';
 import { Check, MapPin } from 'lucide-react-native';
 import { useTheme } from '../../theme/ThemeProvider';
 import { Text } from '../primitives/Text';
 import { haptic } from '../../lib/haptics';
+
+// Idempotent — safe to call multiple times. Reads the public token from EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN.
+Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? null);
 
 export interface GuineaCity {
   name: string;
@@ -64,13 +67,12 @@ export const GUINEA_CITIES: GuineaCity[] = [
   { name: 'Yomou', region: 'Nzérékoré', lat: 7.5664, lng: -9.2592 },
 ];
 
-const GUINEA_CENTER = { latitude: 10.0, longitude: -11.0 };
-const GUINEA_ZOOM = 6;
+const GUINEA_CENTER: [number, number] = [-11.0, 10.0]; // [lng, lat] — Mapbox uses lng-first
+const GUINEA_ZOOM = 5.5;
 
-function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
+function planarDistance(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
   const dLat = a.lat - b.lat;
   const dLng = a.lng - b.lng;
-  // Crude planar distance; fine for "nearest city in Guinea" snapping.
   return Math.sqrt(dLat * dLat + dLng * dLng);
 }
 
@@ -89,13 +91,12 @@ export function CityMapPicker({
   const cityScrollRef = useRef<ScrollView | null>(null);
   const regionTabLayouts = useRef<Record<string, { x: number; w: number }>>({});
   const cityChipLayouts = useRef<Record<string, { x: number; w: number }>>({});
+  const cameraRef = useRef<Camera>(null);
 
-  const [camera, setCamera] = useState(() => {
-    const c = GUINEA_CITIES.find((x) => x.name === value);
-    return c
-      ? { coordinates: { latitude: c.lat, longitude: c.lng }, zoom: 8 }
-      : { coordinates: GUINEA_CENTER, zoom: GUINEA_ZOOM };
-  });
+  const selectedCity = useMemo(
+    () => GUINEA_CITIES.find((c) => c.name === value),
+    [value],
+  );
 
   const citiesInRegion = useMemo(
     () => GUINEA_CITIES.filter((c) => c.region === activeRegion),
@@ -117,50 +118,32 @@ export function CityMapPicker({
     }
   }, [value, activeRegion]);
 
-  const markers = useMemo(
-    () =>
-      GUINEA_CITIES.map((c) => ({
-        id: c.name,
-        coordinates: { latitude: c.lat, longitude: c.lng },
-        title: c.name,
-        tintColor: c.name === value ? colors.primary : colors.accent,
-        systemImage: c.name === value ? 'mappin.circle.fill' : 'mappin.circle',
-      })),
-    [value, colors],
-  );
-
-  // Google Maps marker schema differs slightly
-  const googleMarkers = useMemo(
-    () =>
-      GUINEA_CITIES.map((c) => ({
-        id: c.name,
-        coordinates: { latitude: c.lat, longitude: c.lng },
-        title: c.name,
-        snippet: c.name === value ? 'Sélectionné' : undefined,
-      })),
-    [value],
-  );
+  // Pan/zoom the map whenever the selected city changes
+  useEffect(() => {
+    if (!selectedCity || !cameraRef.current) return;
+    cameraRef.current.setCamera({
+      centerCoordinate: [selectedCity.lng, selectedCity.lat],
+      zoomLevel: 8,
+      animationDuration: 600,
+    });
+  }, [selectedCity]);
 
   const handleSelect = (cityName: string) => {
     haptic.selection();
     onChange(cityName);
     const c = GUINEA_CITIES.find((x) => x.name === cityName);
-    if (c) {
-      setCamera({ coordinates: { latitude: c.lat, longitude: c.lng }, zoom: 8 });
-      if (c.region !== activeRegion) setActiveRegion(c.region as Region);
-    }
+    if (c && c.region !== activeRegion) setActiveRegion(c.region as Region);
   };
 
-  const handleMapClick = (coordinates: { latitude?: number; longitude?: number }) => {
-    if (coordinates.latitude == null || coordinates.longitude == null) return;
-    // Snap to the nearest Guinea city
+  // Mapbox onPress payload: { geometry: { coordinates: [lng, lat] } }
+  const handleMapPress = (feature: { geometry?: { coordinates?: [number, number] } }) => {
+    const coords = feature.geometry?.coordinates;
+    if (!coords) return;
+    const [lng, lat] = coords;
     let nearest = GUINEA_CITIES[0]!;
     let bestD = Infinity;
     for (const c of GUINEA_CITIES) {
-      const d = distanceKm(
-        { lat: coordinates.latitude, lng: coordinates.longitude },
-        { lat: c.lat, lng: c.lng },
-      );
+      const d = planarDistance({ lat, lng }, { lat: c.lat, lng: c.lng });
       if (d < bestD) {
         bestD = d;
         nearest = c;
@@ -198,11 +181,7 @@ export function CityMapPicker({
           ref={regionScrollRef}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingHorizontal: 2,
-            gap: 6,
-            alignItems: 'center',
-          }}
+          contentContainerStyle={{ paddingHorizontal: 2, gap: 6, alignItems: 'center' }}
         >
           {REGIONS.map((r) => {
             const on = r === activeRegion;
@@ -250,11 +229,7 @@ export function CityMapPicker({
           ref={cityScrollRef}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingHorizontal: 2,
-            gap: 6,
-            alignItems: 'center',
-          }}
+          contentContainerStyle={{ paddingHorizontal: 2, gap: 6, alignItems: 'center' }}
         >
           {citiesInRegion.map((c) => {
             const on = c.name === value;
@@ -309,36 +284,49 @@ export function CityMapPicker({
           backgroundColor: colors.bgSunken,
         }}
       >
-        {Platform.OS === 'ios' ? (
-          <AppleMaps.View
-            style={{ flex: 1 }}
-            cameraPosition={camera}
-            markers={markers}
-            uiSettings={{ compassEnabled: false, scaleBarEnabled: false }}
-            onMarkerClick={(m) => {
-              if (m.id) handleSelect(m.id);
-            }}
-            onMapClick={(e) => handleMapClick(e.coordinates)}
-          />
-        ) : Platform.OS === 'android' ? (
-          <GoogleMaps.View
-            style={{ flex: 1 }}
-            cameraPosition={camera}
-            markers={googleMarkers}
-            uiSettings={{
-              compassEnabled: false,
-              zoomControlsEnabled: false,
-              myLocationButtonEnabled: false,
-            }}
-            onMarkerClick={(m) => {
-              if (m.id) handleSelect(m.id);
-            }}
-            onMapClick={(e) => handleMapClick(e.coordinates)}
-          />
-        ) : (
+        {Platform.OS === 'web' ? (
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Text tone="muted">La carte n'est pas disponible sur le web.</Text>
           </View>
+        ) : (
+          <MapView
+            style={{ flex: 1 }}
+            styleURL="mapbox://styles/mapbox/streets-v12"
+            compassEnabled={false}
+            scaleBarEnabled={false}
+            logoEnabled={true}
+            attributionEnabled={true}
+            onPress={handleMapPress}
+          >
+            <Camera
+              ref={cameraRef}
+              defaultSettings={{
+                centerCoordinate: selectedCity
+                  ? [selectedCity.lng, selectedCity.lat]
+                  : GUINEA_CENTER,
+                zoomLevel: selectedCity ? 8 : GUINEA_ZOOM,
+              }}
+            />
+            {GUINEA_CITIES.map((c) => (
+              <PointAnnotation
+                key={c.name}
+                id={c.name}
+                coordinate={[c.lng, c.lat]}
+                onSelected={() => handleSelect(c.name)}
+              >
+                <View
+                  style={{
+                    width: c.name === value ? 18 : 12,
+                    height: c.name === value ? 18 : 12,
+                    borderRadius: 999,
+                    backgroundColor: c.name === value ? colors.primary : colors.accent,
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                  }}
+                />
+              </PointAnnotation>
+            ))}
+          </MapView>
         )}
       </View>
 

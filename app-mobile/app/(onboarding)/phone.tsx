@@ -7,6 +7,9 @@ import { useTheme } from '../../src/theme/ThemeProvider';
 import { Text } from '../../src/components/primitives/Text';
 import { Button } from '../../src/components/primitives/Button';
 import { useAuth } from '../../src/stores/auth';
+import { useRequestOtp } from '../../src/data/queries/auth';
+import { toToastMessage } from '../../src/lib/api';
+import { useToast } from '../../src/components/feedback/Toast';
 
 function GuineaFlag() {
   return (
@@ -31,7 +34,12 @@ export default function PhoneRoute() {
   const [phone, setPhone] = useState('622 55 12 88');
   const [focused, setFocused] = useState(false);
   const setPendingPhone = useAuth((s) => s.setPendingPhone);
+  const setPendingOtpId = useAuth((s) => s.setPendingOtpId);
+  const setPendingDevCode = useAuth((s) => s.setPendingDevCode);
+  const requestOtp = useRequestOtp();
+  const toast = useToast();
   const valid = phone.replace(/\D/g, '').length >= 8;
+  const busy = requestOtp.isPending;
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -179,11 +187,20 @@ export default function PhoneRoute() {
             variant="dark"
             size="lg"
             block
-            label="Recevoir le code"
-            disabled={!valid}
-            onPress={() => {
-              setPendingPhone(`+224 ${phone}`);
-              router.push('/(onboarding)/otp');
+            label={busy ? 'Envoi…' : 'Recevoir le code'}
+            disabled={!valid || busy}
+            onPress={async () => {
+              const target = `+224${phone.replace(/\D/g, '')}`;
+              try {
+                const { otp_id, dev_code } = await requestOtp.mutateAsync({ channel: 'phone', target });
+                setPendingPhone(`+224 ${phone}`);
+                setPendingOtpId(otp_id);
+                setPendingDevCode(dev_code ?? null);
+                router.push('/(onboarding)/otp');
+              } catch (e: unknown) {
+                console.error('[otp-request] error:', e);
+                toast.show(toToastMessage(e, 'Échec de l’envoi du code'), 'danger');
+              }
             }}
           />
         </View>

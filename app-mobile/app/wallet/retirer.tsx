@@ -13,12 +13,14 @@ import { Card } from '../../src/components/primitives/Card';
 import { SettingsRow } from '../../src/components/lists/SettingsRow';
 import { formatGNF } from '../../src/lib/format';
 import { useToast } from '../../src/components/feedback/Toast';
+import { useWithdrawWallet } from '../../src/data/queries';
+import { toToastMessage } from '../../src/lib/api';
 
 export default function RetirerRoute() {
   const { colors } = useTheme();
   const [amount, setAmount] = useState(200_000);
   const { show } = useToast();
-  const [loading, setLoading] = useState(false);
+  const withdraw = useWithdrawWallet();
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -60,16 +62,20 @@ export default function RetirerRoute() {
         <Button
           size="lg"
           block
-          loading={loading}
+          loading={withdraw.isPending}
           label={`Retirer ${formatGNF(amount)}`}
-          onPress={() => {
-            setLoading(true);
-            setTimeout(() => {
-              setLoading(false);
-              show('Retrait en cours de traitement', 'info');
-              router.back();
-            }, 1000);
-          }}
+          onPress={() =>
+            withdraw.mutate(
+              { amountGnf: amount },
+              {
+                onSuccess: () => {
+                  show('Retrait en cours de traitement', 'info');
+                  router.back();
+                },
+                onError: (e) => show(toToastMessage(e, 'Retrait impossible'), 'danger'),
+              },
+            )
+          }
         />
       </StickyBottom>
     </SafeAreaView>

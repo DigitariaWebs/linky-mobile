@@ -7,6 +7,9 @@ import { useTheme } from '../../src/theme/ThemeProvider';
 import { Text } from '../../src/components/primitives/Text';
 import { Button } from '../../src/components/primitives/Button';
 import { useAuth } from '../../src/stores/auth';
+import { useRequestOtp, useVerifyOtp } from '../../src/data/queries/auth';
+import { toToastMessage } from '../../src/lib/api';
+import { useToast } from '../../src/components/feedback/Toast';
 import { maskPhone } from '../../src/lib/format';
 import { haptic } from '../../src/lib/haptics';
 
@@ -91,6 +94,15 @@ function OtpCells({
 export default function OtpRoute() {
   const { colors } = useTheme();
   const phone = useAuth((s) => s.pendingPhone);
+  const pendingOtpId = useAuth((s) => s.pendingOtpId);
+  const setPendingOtpId = useAuth((s) => s.setPendingOtpId);
+  const pendingDevCode = useAuth((s) => s.pendingDevCode);
+  const setPendingDevCode = useAuth((s) => s.setPendingDevCode);
+  const setTokens = useAuth((s) => s.setTokens);
+  const signIn = useAuth((s) => s.signIn);
+  const verifyOtp = useVerifyOtp();
+  const requestOtp = useRequestOtp();
+  const toast = useToast();
   const [code, setCode] = useState('');
   const [seconds, setSeconds] = useState(42);
 
@@ -100,13 +112,41 @@ export default function OtpRoute() {
     return () => clearInterval(t);
   }, [seconds]);
 
+  // DEV-ONLY auto-fill: in stub mode otp-request echoes the code; drop it into the
+  // input so the existing 6-digit auto-verify effect fires. Cleared after consuming.
   useEffect(() => {
-    if (code.length === CODE_LENGTH) {
-      haptic.success();
-      const t = setTimeout(() => router.push('/(onboarding)/profile-setup'), 220);
-      return () => clearTimeout(t);
+    if (pendingDevCode) {
+      setCode(pendingDevCode);
+      setPendingDevCode(null);
     }
-  }, [code]);
+  }, [pendingDevCode, setPendingDevCode]);
+
+  useEffect(() => {
+    if (code.length !== CODE_LENGTH || verifyOtp.isPending) return;
+    if (!pendingOtpId) {
+      toast.show('Session OTP introuvable — recommence', 'danger');
+      router.replace('/(onboarding)/phone');
+      return;
+    }
+    (async () => {
+      try {
+        const { access_token, refresh_token, user } = await verifyOtp.mutateAsync({
+          otp_id: pendingOtpId,
+          code,
+        });
+        await setTokens(access_token, refresh_token);
+        setPendingOtpId(null);
+        signIn(user.id);
+        haptic.success();
+        router.push('/(onboarding)/profile-setup');
+      } catch (e: unknown) {
+        console.error('[otp-verify] error:', e);
+        toast.show(toToastMessage(e, 'Code invalide'), 'danger');
+        setCode('');
+        haptic.warning();
+      }
+    })();
+  }, [code, pendingOtpId, verifyOtp, setTokens, setPendingOtpId, signIn, toast]);
 
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
   const ss = String(seconds % 60).padStart(2, '0');
@@ -193,9 +233,20 @@ export default function OtpRoute() {
               </Text>
             ) : (
               <Pressable
-                onPress={() => {
-                  setSeconds(60);
-                  haptic.light();
+                onPress={async () => {
+                  if (requestOtp.isPending) return;
+                  // Re-request OTP for the same target. Server-side: 1/min/target limit applies.
+                  const target = phone.replace(/\s+/g, '');
+                  try {
+                    const { otp_id, dev_code } = await requestOtp.mutateAsync({ channel: 'phone', target });
+                    setPendingOtpId(otp_id);
+                    setPendingDevCode(dev_code ?? null);
+                    setSeconds(60);
+                    haptic.light();
+                  } catch (e: unknown) {
+                    console.error('[otp-resend] error:', e);
+                    toast.show(toToastMessage(e, 'Renvoi impossible'), 'danger');
+                  }
                 }}
                 style={{
                   flexDirection: 'row',
@@ -210,7 +261,7 @@ export default function OtpRoute() {
               >
                 <RefreshCw size={13} color={colors.text} strokeWidth={2} />
                 <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }}>
-                  Renvoyer le code
+                  {requestOtp.isPending ? 'Envoi…' : 'Renvoyer le code'}
                 </Text>
               </Pressable>
             )}
@@ -222,9 +273,12 @@ export default function OtpRoute() {
             variant="dark"
             size="lg"
             block
-            label="Vérifier"
-            disabled={code.length !== CODE_LENGTH}
-            onPress={() => router.push('/(onboarding)/profile-setup')}
+            label={verifyOtp.isPending ? 'Vérification…' : 'Vérifier'}
+            disabled={code.length !== CODE_LENGTH || verifyOtp.isPending}
+            onPress={() => {
+              // The effect above auto-fires when code reaches 6 digits; this button is a manual fallback.
+              if (code.length === CODE_LENGTH) setCode(code);
+            }}
           />
         </View>
       </View>

@@ -8,5 +8,6 @@ android/
 .DS_Store
 .env*
 !.env.example
+.mcp.json
 expo-env.d.ts
 nativewind-env.d.ts

@@ -1,12 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { mockOrders, mockWallet } from '../mockOrders';
-import type { Order, Wallet, PaymentMethod } from '../types';
+import { mockOrders } from '../mockOrders';
+import type { Order, PaymentMethod } from '../types';
 import { latency } from './latency';
 import { useCart } from '../../stores/cart';
 import { getProduct } from '../mockProducts';
 
 const localOrders: Order[] = [...mockOrders];
-let localWallet: Wallet = { ...mockWallet, movements: [...mockWallet.movements] };
 
 export function useOrders() {
   return useQuery({
@@ -25,16 +24,6 @@ export function useOrder(id: string | undefined) {
     queryFn: async (): Promise<Order | undefined> => {
       await latency();
       return localOrders.find((o) => o.id === id);
-    },
-  });
-}
-
-export function useWallet() {
-  return useQuery({
-    queryKey: ['wallet'],
-    queryFn: async (): Promise<Wallet> => {
-      await latency();
-      return localWallet;
     },
   });
 }
@@ -117,35 +106,3 @@ export function useConfirmReception() {
   });
 }
 
-interface RechargeArgs {
-  amountGnf: number;
-  source: 'orange-money' | 'mtn-money' | 'card';
-}
-
-export function useRechargeWallet() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ amountGnf, source }: RechargeArgs) => {
-      await new Promise((r) => setTimeout(r, 1200));
-      const sourceLabel =
-        source === 'orange-money' ? 'Orange Money' : source === 'mtn-money' ? 'MTN Money' : 'Carte';
-      localWallet = {
-        ...localWallet,
-        balanceGnf: localWallet.balanceGnf + amountGnf,
-        movements: [
-          {
-            id: `wm_${Date.now()}`,
-            direction: 'in',
-            label: `Recharge ${sourceLabel}`,
-            amountGnf,
-            date: new Date().toISOString(),
-            status: 'received',
-          },
-          ...localWallet.movements,
-        ],
-      };
-      return amountGnf;
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['wallet'] }),
-  });
-}

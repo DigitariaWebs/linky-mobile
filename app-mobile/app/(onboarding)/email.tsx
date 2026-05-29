@@ -14,6 +14,12 @@ import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../../src/theme/ThemeProvider';
 import { Text } from '../../src/components/primitives/Text';
 import { Button } from '../../src/components/primitives/Button';
+import { useAuth } from '../../src/stores/auth';
+import { useEmailSignin, useEmailSignup } from '../../src/data/queries/auth';
+import { toToastMessage } from '../../src/lib/api';
+import { useToast } from '../../src/components/feedback/Toast';
+
+type Mode = 'signup' | 'signin';
 
 type FieldKey = 'email' | 'password' | 'confirm';
 
@@ -93,13 +99,21 @@ function FormField({
 
 export default function EmailRoute() {
   const { colors } = useTheme();
+  const [mode, setMode] = useState<Mode>('signup');
   const [email, setEmail] = useState('fatou.balde@gmail.com');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const setTokens = useAuth((s) => s.setTokens);
+  const signIn = useAuth((s) => s.signIn);
+  const signup = useEmailSignup();
+  const signin = useEmailSignin();
+  const toast = useToast();
 
+  const isSignup = mode === 'signup';
+  const busy = signup.isPending || signin.isPending;
   const passwordOk = password.length >= 6;
   const passwordsMatch = passwordOk && password === confirm;
-  const valid = email.includes('@') && passwordOk && passwordsMatch;
+  const valid = email.includes('@') && passwordOk && (isSignup ? passwordsMatch : true) && !busy;
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -136,19 +150,19 @@ export default function EmailRoute() {
             }}
           >
             <Text style={{ fontSize: 11, fontWeight: '700', color: colors.primaryDeep, letterSpacing: 0.4 }}>
-              INSCRIPTION
+              {isSignup ? 'INSCRIPTION' : 'CONNEXION'}
             </Text>
           </View>
 
           <Text variant="dispL" style={{ fontSize: 32, lineHeight: 38 }}>
-            Crée ton compte.
+            {isSignup ? 'Crée ton compte.' : 'Bon retour.'}
           </Text>
           <Text
             variant="bodyM"
             tone="muted"
             style={{ marginTop: 10, fontSize: 15, lineHeight: 22, letterSpacing: 0 }}
           >
-            Pour payer en € avec ta carte bancaire.
+            {isSignup ? 'Pour payer en € avec ta carte bancaire.' : 'Connecte-toi avec ton email et ton mot de passe.'}
           </Text>
 
           <View style={{ marginTop: 24, gap: 14 }}>
@@ -169,15 +183,17 @@ export default function EmailRoute() {
               Icon={Lock}
               secure
             />
-            <FormField
-              label="CONFIRMER"
-              value={confirm}
-              onChangeText={setConfirm}
-              placeholder="Retape ton mot de passe"
-              Icon={Lock}
-              secure
-            />
-            {confirm.length > 0 && (
+            {isSignup && (
+              <FormField
+                label="CONFIRMER"
+                value={confirm}
+                onChangeText={setConfirm}
+                placeholder="Retape ton mot de passe"
+                Icon={Lock}
+                secure
+              />
+            )}
+            {isSignup && confirm.length > 0 && (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 4 }}>
                 <Check
                   size={12}
@@ -195,6 +211,24 @@ export default function EmailRoute() {
                 </Text>
               </View>
             )}
+          </View>
+
+          {/* Mode toggle */}
+          <View style={{ marginTop: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
+            <Text style={{ fontSize: 13, color: colors.textMuted, letterSpacing: 0 }}>
+              {isSignup ? 'Déjà un compte ?' : 'Pas encore de compte ?'}
+            </Text>
+            <Pressable
+              onPress={() => {
+                setMode(isSignup ? 'signin' : 'signup');
+                setConfirm('');
+              }}
+              hitSlop={8}
+            >
+              <Text style={{ fontSize: 13, fontWeight: '700', color: colors.primaryDeep }}>
+                {isSignup ? 'Se connecter' : 'Créer un compte'}
+              </Text>
+            </Pressable>
           </View>
 
           {/* Divider */}
@@ -252,9 +286,27 @@ export default function EmailRoute() {
             variant="dark"
             size="lg"
             block
-            label="Créer mon compte"
+            label={
+              isSignup
+                ? signup.isPending ? 'Création…' : 'Créer mon compte'
+                : signin.isPending ? 'Connexion…' : 'Se connecter'
+            }
             disabled={!valid}
-            onPress={() => router.push('/(onboarding)/profile-setup')}
+            onPress={async () => {
+              try {
+                const mutation = isSignup ? signup : signin;
+                const { access_token, refresh_token, user } = await mutation.mutateAsync({ email, password });
+                await setTokens(access_token, refresh_token);
+                signIn(user.id);
+                router.push('/(onboarding)/profile-setup');
+              } catch (e: unknown) {
+                console.error(`[email-${mode}] error:`, e);
+                toast.show(
+                  toToastMessage(e, isSignup ? 'Création échouée' : 'Connexion échouée'),
+                  'danger',
+                );
+              }
+            }}
           />
         </View>
       </View>
