@@ -53,3 +53,16 @@ export function maskPhone(phone: string): string {
   if (phone.length < 8) return phone;
   return phone.replace(/(\d{2})\s?(\d{2})(?=\s?\d{2}\s?\d{2}$)/, '•• $2');
 }
+
+export function maskEmail(email: string): string {
+  // fatou.balde@gmail.com -> f••••.b••@gmail.com
+  const at = email.indexOf('@');
+  if (at < 1) return email;
+  const local = email.slice(0, at);
+  const domain = email.slice(at);
+  const masked = local
+    .split('.')
+    .map((part) => (part.length <= 1 ? part : part[0] + '•'.repeat(Math.min(part.length - 1, 4))))
+    .join('.');
+  return `${masked}${domain}`;
+}

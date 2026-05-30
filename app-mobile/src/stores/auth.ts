@@ -17,6 +17,7 @@ interface AuthState {
   isOnboarded: boolean;
   channel: AuthChannel;
   pendingPhone: string;
+  pendingEmail: string;
   pendingOtpId: string | null;
   // DEV-ONLY: the OTP code echoed by otp-request in stub mode, so otp.tsx can auto-fill
   // and the tester never reads server logs. Never populated when a real provider is wired.
@@ -24,6 +25,7 @@ interface AuthState {
   roles: UserRole[];
   setChannel: (c: AuthChannel) => void;
   setPendingPhone: (p: string) => void;
+  setPendingEmail: (e: string) => void;
   setPendingOtpId: (id: string | null) => void;
   setPendingDevCode: (code: string | null) => void;
   setRoles: (r: UserRole[]) => void;
@@ -57,11 +59,13 @@ export const useAuth = create<AuthState>((set) => ({
   isOnboarded: initialDone,
   channel: 'phone',
   pendingPhone: '+224 622 55 12 88',
+  pendingEmail: '',
   pendingOtpId: null,
   pendingDevCode: null,
   roles: loadRoles(),
   setChannel: (channel) => set({ channel }),
   setPendingPhone: (pendingPhone) => set({ pendingPhone }),
+  setPendingEmail: (pendingEmail) => set({ pendingEmail }),
   setPendingOtpId: (pendingOtpId) => set({ pendingOtpId }),
   setPendingDevCode: (pendingDevCode) => set({ pendingDevCode }),
   setRoles: (roles) => {

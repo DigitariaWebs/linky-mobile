@@ -1,15 +1,28 @@
-import { useQuery } from '@tanstack/react-query';
-import { mockShops, getShop } from '../mockShops';
+// Wired to live edge functions: list-shops / get-shop. Public reads (no JWT required).
+// Returns shops_with_counts (includes productCount), so the shape is unchanged from the mock.
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiPost } from '../../lib/api';
 import type { Shop } from '../types';
-import { latency } from './latency';
+
+export interface UpsertShopInput {
+  id?: string;
+  name: string;
+  city: string;
+  about?: string;
+  cover_url?: string | null;
+  avatar_url?: string | null;
+}
 
 export function useShops(limit?: number) {
   return useQuery({
     queryKey: ['shops', limit],
     queryFn: async (): Promise<Shop[]> => {
-      await latency();
-      const list = mockShops.filter((s) => s.verified);
-      return typeof limit === 'number' ? list.slice(0, limit) : list;
+      const { shops } = await apiPost<{ shops: Shop[] }>({
+        path: '/list-shops',
+        authed: false,
+        body: { verified_only: true, ...(typeof limit === 'number' ? { limit } : {}) },
+      });
+      return shops;
     },
   });
 }
@@ -19,8 +32,38 @@ export function useShop(id: string | undefined) {
     queryKey: ['shop', id],
     enabled: !!id,
     queryFn: async (): Promise<Shop | undefined> => {
-      await latency();
-      return getShop(id as string);
+      const { shop } = await apiPost<{ shop: Shop }>({
+        path: '/get-shop',
+        authed: false,
+        body: { id },
+      });
+      return shop;
+    },
+  });
+}
+
+// Authed seller helpers.
+export function useMyShops() {
+  return useQuery({
+    queryKey: ['my-shops'],
+    queryFn: async (): Promise<Shop[]> => {
+      const { shops } = await apiPost<{ shops: Shop[] }>({ path: '/shop-get-mine', body: {} });
+      return shops;
+    },
+  });
+}
+
+export function useUpsertShop() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: UpsertShopInput) => {
+      const r = await apiPost<{ shop: Shop }>({ path: '/shop-upsert', body: input });
+      return r.shop;
+    },
+    onSuccess: (shop) => {
+      qc.invalidateQueries({ queryKey: ['my-shops'] });
+      qc.invalidateQueries({ queryKey: ['shop', shop.id] });
+      qc.invalidateQueries({ queryKey: ['shops'] });
     },
   });
 }

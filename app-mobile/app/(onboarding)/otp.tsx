@@ -10,7 +10,7 @@ import { useAuth } from '../../src/stores/auth';
 import { useRequestOtp, useVerifyOtp } from '../../src/data/queries/auth';
 import { toToastMessage } from '../../src/lib/api';
 import { useToast } from '../../src/components/feedback/Toast';
-import { maskPhone } from '../../src/lib/format';
+import { maskEmail, maskPhone } from '../../src/lib/format';
 import { haptic } from '../../src/lib/haptics';
 
 const CODE_LENGTH = 6;
@@ -93,7 +93,9 @@ function OtpCells({
 
 export default function OtpRoute() {
   const { colors } = useTheme();
+  const channel = useAuth((s) => s.channel);
   const phone = useAuth((s) => s.pendingPhone);
+  const email = useAuth((s) => s.pendingEmail);
   const pendingOtpId = useAuth((s) => s.pendingOtpId);
   const setPendingOtpId = useAuth((s) => s.setPendingOtpId);
   const pendingDevCode = useAuth((s) => s.pendingDevCode);
@@ -125,7 +127,7 @@ export default function OtpRoute() {
     if (code.length !== CODE_LENGTH || verifyOtp.isPending) return;
     if (!pendingOtpId) {
       toast.show('Session OTP introuvable — recommence', 'danger');
-      router.replace('/(onboarding)/phone');
+      router.replace(channel === 'email' ? '/(onboarding)/email' : '/(onboarding)/phone');
       return;
     }
     (async () => {
@@ -158,7 +160,7 @@ export default function OtpRoute() {
           <Pressable
             onPress={() => {
               if (router.canGoBack()) router.back();
-              else router.replace('/(onboarding)/phone');
+              else router.replace(channel === 'email' ? '/(onboarding)/email' : '/(onboarding)/phone');
             }}
             style={{
               width: 40,
@@ -198,16 +200,16 @@ export default function OtpRoute() {
             tone="muted"
             style={{ marginTop: 10, fontSize: 15, lineHeight: 22, letterSpacing: 0 }}
           >
-            Envoyé au{' '}
+            {channel === 'email' ? 'Envoyé à' : 'Envoyé au'}{' '}
             <Text
               style={{
                 color: colors.text,
                 fontWeight: '600',
-                fontVariant: ['tabular-nums'],
+                fontVariant: channel === 'email' ? undefined : ['tabular-nums'],
                 letterSpacing: 0.3,
               }}
             >
-              {maskPhone(phone)}
+              {channel === 'email' ? maskEmail(email) : maskPhone(phone)}
             </Text>
             .
           </Text>
@@ -236,9 +238,9 @@ export default function OtpRoute() {
                 onPress={async () => {
                   if (requestOtp.isPending) return;
                   // Re-request OTP for the same target. Server-side: 1/min/target limit applies.
-                  const target = phone.replace(/\s+/g, '');
+                  const target = channel === 'email' ? email.trim() : phone.replace(/\s+/g, '');
                   try {
-                    const { otp_id, dev_code } = await requestOtp.mutateAsync({ channel: 'phone', target });
+                    const { otp_id, dev_code } = await requestOtp.mutateAsync({ channel, target });
                     setPendingOtpId(otp_id);
                     setPendingDevCode(dev_code ?? null);
                     setSeconds(60);

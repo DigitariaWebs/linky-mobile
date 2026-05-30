@@ -33,6 +33,7 @@ export default function PhoneRoute() {
   const { colors } = useTheme();
   const [phone, setPhone] = useState('622 55 12 88');
   const [focused, setFocused] = useState(false);
+  const setChannel = useAuth((s) => s.setChannel);
   const setPendingPhone = useAuth((s) => s.setPendingPhone);
   const setPendingOtpId = useAuth((s) => s.setPendingOtpId);
   const setPendingDevCode = useAuth((s) => s.setPendingDevCode);
@@ -193,6 +194,7 @@ export default function PhoneRoute() {
               const target = `+224${phone.replace(/\D/g, '')}`;
               try {
                 const { otp_id, dev_code } = await requestOtp.mutateAsync({ channel: 'phone', target });
+                setChannel('phone');
                 setPendingPhone(`+224 ${phone}`);
                 setPendingOtpId(otp_id);
                 setPendingDevCode(dev_code ?? null);

@@ -15,11 +15,15 @@ import { photos } from '../../../src/data/photos';
 import { useCreateListing } from '../../../src/stores/createListing';
 import { formatGNF } from '../../../src/lib/format';
 import { useToast } from '../../../src/components/feedback/Toast';
+import { useCreateProduct } from '../../../src/data/queries/products';
+import { toToastMessage } from '../../../src/lib/api';
 
 export default function CreatePreviewRoute() {
   const { colors, radii } = useTheme();
   const state = useCreateListing();
+  const reset = useCreateListing((s) => s.reset);
   const { show } = useToast();
+  const createProduct = useCreateProduct();
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -59,13 +63,30 @@ export default function CreatePreviewRoute() {
         </View>
       </View>
       <StickyBottom style={{ flexDirection: 'row', gap: 8 }}>
-        <Button variant="secondary" label="Modifier" onPress={() => router.back()} />
+        <Button variant="secondary" label="Modifier" onPress={() => router.back()} disabled={createProduct.isPending} />
         <Button
-          label="Publier mon annonce"
+          label={createProduct.isPending ? 'Publication…' : 'Publier mon annonce'}
           style={{ flex: 1 }}
-          onPress={() => {
-            show('Annonce publiée 🎉', 'success');
-            router.replace('/(tabs)/boutique');
+          disabled={createProduct.isPending}
+          onPress={async () => {
+            try {
+              await createProduct.mutateAsync({
+                title: state.title,
+                description: state.description,
+                price_minor: state.priceGnf,
+                category: state.category,
+                condition: state.condition,
+                photos: state.photos,
+                city: state.city,
+                // Geography simplified per 2026-05-29 client meeting: cities only, no districts.
+              });
+              show('Annonce publiée 🎉', 'success');
+              reset();
+              router.replace('/(tabs)/boutique');
+            } catch (e: unknown) {
+              console.error('[product-create] error:', e);
+              show(toToastMessage(e, 'Publication échouée'), 'danger');
+            }
           }}
         />
       </StickyBottom>

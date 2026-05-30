@@ -55,6 +55,12 @@
       ],
       "expo-image",
       "expo-localization",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Linky a besoin d'accéder à tes photos pour les ajouter à tes annonces."
+        }
+      ],
       "@rnmapbox/maps"
     ],
     "experiments": {
