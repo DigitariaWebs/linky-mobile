@@ -79,6 +79,7 @@ export default function CreatePhotosRoute() {
       const filename = sanitizeFilename(asset.fileName, extForMime(contentType));
 
       const { upload_url, public_url } = await requestUploadUrl.mutateAsync({
+        kind: 'product',
         filename,
         content_type: contentType,
       });

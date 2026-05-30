@@ -33,7 +33,7 @@ import { haptic } from '../../lib/haptics';
 import { formatGNF } from '../../lib/format';
 import { mockShops } from '../../data/mockShops';
 import { mockProperties } from '../../data/mockProperties';
-import { useProducts } from '../../data/queries';
+import { useProducts, useMyShops } from '../../data/queries';
 
 export type ProMode = 'shop' | 'estate';
 
@@ -151,8 +151,10 @@ export function ModeTab({
 // =================================================================
 
 export function ShopDashboard() {
-  const shop = mockShops[0]!;
-  const { data: products } = useProducts({ shopId: shop.id });
+  const { colors } = useTheme();
+  const { data: shops } = useMyShops();
+  const myShop = shops?.[0];
+  const { data: products } = useProducts({ shopId: myShop?.id });
 
   return (
     <View>
@@ -234,23 +236,53 @@ export function ShopDashboard() {
         <ViewsChart bars={VIEW_BARS} title="VUES · 30 JOURS" value="4 280" trend="+24 %" />
       </View>
 
-      <View style={{ paddingHorizontal: 20, paddingTop: 28 }}>
-        <SectionTitle title="Mes annonces" />
-        <View style={{ gap: 12 }}>
-          {products?.slice(0, 4).map((p) => (
-            <ProductRow
-              key={p.id}
-              title={p.title}
-              price={formatGNF(p.priceGnf)}
-              cover={p.photos[0]}
-              views={p.viewCount}
-              favs={p.favCount}
-              boosted={p.boosted}
-              onPress={() => router.push(`/product/${p.id}`)}
-            />
-          ))}
+      {shops === undefined ? null : myShop ? (
+        <View style={{ paddingHorizontal: 20, paddingTop: 28 }}>
+          <SectionTitle title="Mes annonces" />
+          <View style={{ gap: 12 }}>
+            {products?.slice(0, 4).map((p) => (
+              <ProductRow
+                key={p.id}
+                title={p.title}
+                price={formatGNF(p.priceGnf)}
+                cover={p.photos[0]}
+                views={p.viewCount}
+                favs={p.favCount}
+                boosted={p.boosted}
+                onPress={() => router.push(`/product/${p.id}`)}
+              />
+            ))}
+          </View>
         </View>
-      </View>
+      ) : (
+        <View style={{ paddingHorizontal: 20, paddingTop: 28 }}>
+          <SectionTitle title="Mes annonces" />
+          <Pressable
+            onPress={() => {
+              haptic.light();
+              router.push('/create');
+            }}
+            style={{
+              padding: 20,
+              borderRadius: 18,
+              backgroundColor: colors.card,
+              borderWidth: 1.5,
+              borderStyle: 'dashed',
+              borderColor: colors.border,
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <Package size={20} color={colors.textMuted} strokeWidth={1.75} />
+            <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text, letterSpacing: 0 }}>
+              Crée ta première annonce
+            </Text>
+            <Text style={{ fontSize: 11.5, color: colors.textMuted, letterSpacing: 0 }}>
+              Ta boutique se crée à la première publication.
+            </Text>
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 }

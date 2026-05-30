@@ -13,7 +13,7 @@ import { useToast } from '../../src/components/feedback/Toast';
 
 export default function EmailRoute() {
   const { colors } = useTheme();
-  const [email, setEmail] = useState('fatou.balde@gmail.com');
+  const [email, setEmail] = useState('');
   const [focused, setFocused] = useState(false);
   const setChannel = useAuth((s) => s.setChannel);
   const setPendingEmail = useAuth((s) => s.setPendingEmail);

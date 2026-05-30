@@ -56,6 +56,59 @@ export function mapProduct(r: ProductRow) {
   };
 }
 
+export interface PropertyRow {
+  id: string;
+  owner_id: string;
+  shop_id: string | null;
+  type: 'location' | 'vente' | 'terrain';
+  title: string;
+  description: string;
+  price_minor: number | string;
+  per_month: boolean;
+  bedrooms: number | null;
+  area_sqm: number | null;
+  furnished: boolean | null;
+  amenities: string[];
+  city: string;
+  district: string | null;
+  distance_to_road_m: number;
+  lat: number | null;
+  lng: number | null;
+  video_url: string | null;
+  status: 'active' | 'reserved' | 'sold' | 'paused' | 'pending';
+  view_count: number;
+  fav_count: number;
+  created_at: string;
+}
+
+// Property → frontend shape. Photos arrive separately from property_photos (the cover is
+// position 0); mapper just receives the already-ordered URL list. district is required in
+// the frontend Property type so we coalesce null → '' to keep the shape; gps coalesces
+// null lat/lng → 0/0 (frontend treats {0,0} as "no pin").
+export function mapProperty(r: PropertyRow, photos: string[]) {
+  return {
+    id: r.id,
+    ownerId: r.owner_id,
+    shopId: r.shop_id ?? undefined,
+    title: r.title,
+    description: r.description,
+    type: r.type,
+    priceGnf: Number(r.price_minor),
+    perMonth: r.per_month,
+    bedrooms: r.bedrooms ?? undefined,
+    areaSqm: r.area_sqm ?? undefined,
+    furnished: r.furnished ?? undefined,
+    city: r.city,
+    district: r.district ?? '',
+    distanceToRoadMeters: r.distance_to_road_m,
+    photos,
+    videoUrl: r.video_url ?? undefined,
+    status: r.status,
+    gps: { lat: r.lat ?? 0, lng: r.lng ?? 0 },
+    createdAt: r.created_at,
+  };
+}
+
 export function mapShop(r: ShopRow) {
   return {
     id: r.id,

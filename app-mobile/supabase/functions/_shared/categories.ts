@@ -1,19 +1,14 @@
-// V1 product category whitelist. Strings are stored as-is in products.category; the
-// frontend picks from this same list to keep the catalog from fragmenting into typos.
-// Expand here when the catalog grows; no migration needed since the schema accepts any text.
+// V1 product category whitelist. Mirrors the 6 grouped tiles in the create-product wizard
+// (app/create/product/category.tsx) — the wizard is the source of truth, this list just
+// enforces it server-side so manual API hits can't slip in arbitrary labels. Keep the two
+// lists in sync when adding/renaming tiles. Schema accepts any text, so no migration needed.
 export const PRODUCT_CATEGORIES = [
-  'Beauté',
+  'Mode & Beauté',
   'Électronique',
-  'Mode',
   'Maison',
-  'Auto',
-  'Sport',
-  'Alimentation',
-  'Bébé & Enfants',
-  'Bricolage',
-  'Loisirs',
+  'Auto & Moto',
+  'Beauté & Soin',
   'Services',
-  'Autre',
 ] as const;
 
 export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];

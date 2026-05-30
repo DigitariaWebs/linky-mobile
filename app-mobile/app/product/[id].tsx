@@ -24,7 +24,7 @@ import { useTheme } from '../../src/theme/ThemeProvider';
 import { Text } from '../../src/components/primitives/Text';
 import { ProductCard } from '../../src/components/lists/ProductCard';
 import { haptic } from '../../src/lib/haptics';
-import { useProduct, useProducts } from '../../src/data/queries';
+import { useProduct, useProducts, useToggleFavorite } from '../../src/data/queries';
 import { useFavorites } from '../../src/stores/favorites';
 import { useCart } from '../../src/stores/cart';
 import { useToast } from '../../src/components/feedback/Toast';
@@ -41,6 +41,7 @@ export default function ProductDetailRoute() {
   const { data: related } = useProducts({ category: product?.category });
   const isFav = useFavorites((s) => (id ? s.productIds.has(id) : false));
   const toggleFav = useFavorites((s) => s.toggleProduct);
+  const toggleFavorite = useToggleFavorite();
   const addToCart = useCart((s) => s.add);
   const { show } = useToast();
   const [photoIdx, setPhotoIdx] = useState(0);
@@ -104,22 +105,23 @@ export default function ProductDetailRoute() {
               }}
             >
               <CircleButton onPress={() => router.back()} ariaLabel="Retour">
-                <ArrowLeft size={18} color={colors.text} strokeWidth={2} />
+                <ArrowLeft size={18} color="#0E1311" strokeWidth={2} />
               </CircleButton>
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 <CircleButton onPress={() => haptic.light()} ariaLabel="Partager">
-                  <Share2 size={16} color={colors.text} strokeWidth={2} />
+                  <Share2 size={16} color="#0E1311" strokeWidth={2} />
                 </CircleButton>
                 <CircleButton
                   onPress={() => {
                     haptic.light();
                     toggleFav(product.id);
+                    toggleFavorite.mutate(product.id);
                   }}
                   ariaLabel={isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}
                 >
                   <Heart
                     size={16}
-                    color={isFav ? colors.danger : colors.text}
+                    color={isFav ? colors.danger : '#0E1311'}
                     fill={isFav ? colors.danger : 'transparent'}
                     strokeWidth={isFav ? 0 : 2}
                   />
@@ -231,6 +233,19 @@ export default function ProductDetailRoute() {
                 }}
               >
                 {product.viewCount} vues
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Heart size={11} color={colors.textMuted} strokeWidth={2} />
+              <Text
+                style={{
+                  fontSize: 11.5,
+                  color: colors.textMuted,
+                  letterSpacing: 0,
+                  fontVariant: ['tabular-nums'],
+                }}
+              >
+                {product.favCount} favoris
               </Text>
             </View>
           </View>

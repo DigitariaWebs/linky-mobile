@@ -61,6 +61,12 @@
           "photosPermission": "Linky a besoin d'accéder à tes photos pour les ajouter à tes annonces."
         }
       ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Linky utilise ta position pour préremplir l'adresse de tes annonces."
+        }
+      ],
       "@rnmapbox/maps"
     ],
     "experiments": {

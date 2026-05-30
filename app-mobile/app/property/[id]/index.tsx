@@ -2,6 +2,7 @@ import { ScrollView, View } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Image } from 'expo-image';
 import Svg, { Path, Line } from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../../src/theme/ThemeProvider';
 import { Text } from '../../../src/components/primitives/Text';
 import { Chip } from '../../../src/components/primitives/Chip';
@@ -44,19 +45,32 @@ export default function PropertyDetailRoute() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
         <View style={{ aspectRatio: 1, position: 'relative', backgroundColor: colors.bgSunken }}>
           <Image source={prop.photos[0]} style={{ flex: 1 }} contentFit="cover" />
-          <View style={{ position: 'absolute', top: 12, left: 12 }}>
-            <IconButton variant="secondary" size={36} onPress={() => router.back()} style={{ backgroundColor: 'rgba(255,255,255,0.95)', borderColor: 'transparent' }}>
-              <I.arrowLeft size={18} color={colors.text} />
-            </IconButton>
-          </View>
-          <View style={{ position: 'absolute', top: 12, right: 12, flexDirection: 'row', gap: 8 }}>
-            <IconButton variant="secondary" size={36} style={{ backgroundColor: 'rgba(255,255,255,0.95)', borderColor: 'transparent' }}>
-              <I.share size={16} color={colors.text} />
-            </IconButton>
-            <IconButton variant="secondary" size={36} style={{ backgroundColor: 'rgba(255,255,255,0.95)', borderColor: 'transparent' }}>
-              <I.heart size={16} color={colors.text} />
-            </IconButton>
-          </View>
+          {/* Top action row — SafeAreaView adds padding for the status bar notch */}
+          <SafeAreaView
+            edges={['top']}
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, paddingHorizontal: 12 }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                paddingTop: 4,
+              }}
+            >
+              <IconButton variant="secondary" size={36} onPress={() => router.back()} style={{ backgroundColor: 'rgba(255,255,255,0.95)', borderColor: 'transparent' }}>
+                <I.arrowLeft size={18} color="#0E1311" />
+              </IconButton>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <IconButton variant="secondary" size={36} style={{ backgroundColor: 'rgba(255,255,255,0.95)', borderColor: 'transparent' }}>
+                  <I.share size={16} color="#0E1311" />
+                </IconButton>
+                <IconButton variant="secondary" size={36} style={{ backgroundColor: 'rgba(255,255,255,0.95)', borderColor: 'transparent' }}>
+                  <I.heart size={16} color="#0E1311" />
+                </IconButton>
+              </View>
+            </View>
+          </SafeAreaView>
           {prop.videoUrl && (
             <View
               style={{

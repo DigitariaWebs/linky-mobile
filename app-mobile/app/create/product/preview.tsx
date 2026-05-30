@@ -38,7 +38,11 @@ export default function CreatePreviewRoute() {
         </Text>
 
         <View style={{ aspectRatio: 9 / 14, borderRadius: 18, overflow: 'hidden', backgroundColor: colors.discoverBg }}>
-          <Image source={photos.iphone} style={{ flex: 1 }} contentFit="cover" />
+          <Image
+            source={state.photos[0] ? { uri: state.photos[0] } : photos.iphone}
+            style={{ flex: 1 }}
+            contentFit="cover"
+          />
           <LinearGradient
             colors={['rgba(0,0,0,0.4)', 'transparent', 'transparent', 'rgba(0,0,0,0.85)']}
             locations={[0, 0.3, 0.5, 1]}
@@ -70,7 +74,7 @@ export default function CreatePreviewRoute() {
           disabled={createProduct.isPending}
           onPress={async () => {
             try {
-              await createProduct.mutateAsync({
+              const body = {
                 title: state.title,
                 description: state.description,
                 price_minor: state.priceGnf,
@@ -79,7 +83,9 @@ export default function CreatePreviewRoute() {
                 photos: state.photos,
                 city: state.city,
                 // Geography simplified per 2026-05-29 client meeting: cities only, no districts.
-              });
+              };
+              console.log('[preview] product-create body:', JSON.stringify(body));
+              await createProduct.mutateAsync(body);
               show('Annonce publiée 🎉', 'success');
               reset();
               router.replace('/(tabs)/boutique');

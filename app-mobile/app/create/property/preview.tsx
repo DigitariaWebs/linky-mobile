@@ -19,10 +19,18 @@ import { ScreenHeader } from '../../../src/components/nav/ScreenHeader';
 import { haptic } from '../../../src/lib/haptics';
 import { mockProperties } from '../../../src/data/mockProperties';
 import { formatGNF } from '../../../src/lib/format';
+import { useCreateListing } from '../../../src/stores/createListing';
+import { useCreateProperty } from '../../../src/data/queries/properties';
+import { useToast } from '../../../src/components/feedback/Toast';
+import { toToastMessage } from '../../../src/lib/api';
 
 export default function PreviewRoute() {
   const { colors } = useTheme();
   const sample = mockProperties[0]!;
+  const state = useCreateListing();
+  const reset = useCreateListing((s) => s.reset);
+  const createProperty = useCreateProperty();
+  const { show } = useToast();
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -54,7 +62,7 @@ export default function PreviewRoute() {
               }}
             >
               <Image
-                source={sample.photos[0]}
+                source={state.propertyPhotos[0] ? { uri: state.propertyPhotos[0].url } : sample.photos[0]}
                 style={{ flex: 1 }}
                 contentFit="cover"
               />
@@ -81,7 +89,7 @@ export default function PreviewRoute() {
                     includeFontPadding: false,
                   }}
                 >
-                  LOCATION
+                  {state.propertyType === 'location' ? 'LOCATION' : state.propertyType === 'vente' ? 'VENTE' : 'TERRAIN'}
                 </Text>
               </View>
             </View>
@@ -97,7 +105,7 @@ export default function PreviewRoute() {
                 }}
                 numberOfLines={2}
               >
-                Appartement 2 pièces lumineux, Kaloum
+                {state.title}
               </Text>
               <View
                 style={{
@@ -116,10 +124,10 @@ export default function PreviewRoute() {
                     letterSpacing: -0.3,
                   }}
                 >
-                  {formatGNF(sample.priceGnf).replace(' GNF', '')}
+                  {formatGNF(state.priceGnf).replace(' GNF', '')}
                 </Text>
                 <Text style={{ fontSize: 14, fontWeight: '600', color: colors.textMuted }}>
-                  GNF /mois
+                  GNF{state.propertyType === 'location' ? ' /mois' : ''}
                 </Text>
               </View>
               <View
@@ -131,7 +139,9 @@ export default function PreviewRoute() {
                 }}
               >
                 <MapPin size={11} color={colors.textMuted} strokeWidth={2} />
-                <Text style={{ fontSize: 12, color: colors.textMuted }}>Kaloum, Conakry</Text>
+                <Text style={{ fontSize: 12, color: colors.textMuted }}>
+                  {state.district ? `${state.district}, ${state.city}` : state.city}
+                </Text>
               </View>
 
               {/* Spec strip */}
@@ -145,9 +155,8 @@ export default function PreviewRoute() {
                   borderTopColor: colors.border,
                 }}
               >
-                <SpecMini Icon={BedDouble} label="2 ch." />
-                <SpecMini Icon={Bath} label="1 sdb" />
-                <SpecMini Icon={Maximize2} label="68 m²" />
+                <SpecMini Icon={BedDouble} label={`${state.rooms} ch.`} />
+                <SpecMini Icon={Maximize2} label={`${state.areaSqm} m²`} />
               </View>
 
               {/* Amenity chips */}
@@ -195,9 +204,33 @@ export default function PreviewRoute() {
         }}
       >
         <Pressable
-          onPress={() => {
-            haptic.medium();
-            router.replace('/(tabs)');
+          disabled={createProperty.isPending}
+          onPress={async () => {
+            if (createProperty.isPending) return;
+            try {
+              haptic.medium();
+              const property = await createProperty.mutateAsync({
+                type: state.propertyType,
+                title: state.title,
+                price_minor: state.priceGnf,
+                bedrooms: state.rooms || undefined,
+                area_sqm: state.areaSqm || undefined,
+                furnished: state.furnished,
+                amenities: state.amenities,
+                city: state.city,
+                district: state.district || undefined,
+                distance_to_road_m: state.distanceToRoadMeters,
+                lat: state.lat,
+                lng: state.lng,
+                photos: state.propertyPhotos,
+              });
+              show('Annonce publiée 🎉', 'success');
+              reset();
+              router.replace(`/property/${property.id}`);
+            } catch (e: unknown) {
+              console.error('[property-create] error:', e);
+              show(toToastMessage(e, 'Publication échouée'), 'danger');
+            }
           }}
           style={{
             height: 56,
@@ -205,6 +238,7 @@ export default function PreviewRoute() {
             backgroundColor: colors.text,
             alignItems: 'center',
             justifyContent: 'center',
+            opacity: createProperty.isPending ? 0.6 : 1,
           }}
         >
           <Text
@@ -216,7 +250,7 @@ export default function PreviewRoute() {
               includeFontPadding: false,
             }}
           >
-            Publier l'annonce
+            {createProperty.isPending ? 'Publication…' : "Publier l'annonce"}
           </Text>
         </Pressable>
       </SafeAreaView>

@@ -2,6 +2,12 @@ import { create } from 'zustand';
 
 export type ListingKind = 'product' | 'property';
 
+export interface PropertyPhoto {
+  url: string;
+  storage_path: string;
+  position: number;
+}
+
 interface CreateListingState {
   kind: ListingKind;
   sellerType: 'particular' | 'merchant';
@@ -20,6 +26,10 @@ interface CreateListingState {
   district: string;
   distanceToRoadMeters: number;
   furnished: boolean;
+  amenities: string[];
+  propertyPhotos: PropertyPhoto[];
+  lat?: number;
+  lng?: number;
   setKind: (k: ListingKind) => void;
   set: <K extends keyof CreateListingState>(key: K, value: CreateListingState[K]) => void;
   reset: () => void;
@@ -42,6 +52,10 @@ const DEFAULTS = {
   district: 'Kaloum',
   distanceToRoadMeters: 250,
   furnished: true,
+  amenities: [] as string[],
+  propertyPhotos: [] as PropertyPhoto[],
+  lat: undefined as number | undefined,
+  lng: undefined as number | undefined,
 };
 
 export const useCreateListing = create<CreateListingState>((set) => ({

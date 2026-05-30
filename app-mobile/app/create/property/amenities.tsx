@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -21,6 +20,7 @@ import { useTheme } from '../../../src/theme/ThemeProvider';
 import { Text } from '../../../src/components/primitives/Text';
 import { ScreenHeader } from '../../../src/components/nav/ScreenHeader';
 import { haptic } from '../../../src/lib/haptics';
+import { useCreateListing } from '../../../src/stores/createListing';
 
 const AMENITIES: { id: string; label: string; Icon: LucideIcon }[] = [
   { id: 'wifi', label: 'Wi-Fi', Icon: Wifi },
@@ -39,7 +39,9 @@ const AMENITIES: { id: string; label: string; Icon: LucideIcon }[] = [
 
 export default function AmenitiesRoute() {
   const { colors } = useTheme();
-  const [picked, setPicked] = useState<Set<string>>(new Set(['wifi', 'park', 'ac', 'furn']));
+  const amenities = useCreateListing((s) => s.amenities);
+  const setVal = useCreateListing((s) => s.set);
+  const picked = new Set(amenities);
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -67,12 +69,10 @@ export default function AmenitiesRoute() {
                 key={a.id}
                 onPress={() => {
                   haptic.selection();
-                  setPicked((p) => {
-                    const next = new Set(p);
-                    if (next.has(a.id)) next.delete(a.id);
-                    else next.add(a.id);
-                    return next;
-                  });
+                  const next = new Set(amenities);
+                  if (next.has(a.id)) next.delete(a.id);
+                  else next.add(a.id);
+                  setVal('amenities', Array.from(next));
                 }}
                 style={{
                   flexBasis: '47%',

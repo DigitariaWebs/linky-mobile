@@ -1,31 +1,113 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
 import { Camera, Plus, Trash2, Star } from 'lucide-react-native';
 import { useTheme } from '../../../src/theme/ThemeProvider';
 import { Text } from '../../../src/components/primitives/Text';
 import { ScreenHeader } from '../../../src/components/nav/ScreenHeader';
 import { haptic } from '../../../src/lib/haptics';
-import { photos } from '../../../src/data/photos';
+import { useCreateListing } from '../../../src/stores/createListing';
+import { useRequestPhotoUploadUrl } from '../../../src/data/queries/products';
+import { useToast } from '../../../src/components/feedback/Toast';
+import { toToastMessage } from '../../../src/lib/api';
 
-const SAMPLE = [photos.apartment1, photos.livingRoom, photos.apartment2, photos.modernHouse];
+const MAX_PHOTOS = 12;
+const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp'] as const;
+type AllowedMime = (typeof ALLOWED_MIMES)[number];
+
+function sanitizeFilename(raw: string | null | undefined, fallbackExt: string): string {
+  const base = (raw ?? `photo.${fallbackExt}`).replace(/[^A-Za-z0-9._-]/g, '');
+  const trimmed = base.length > 80 ? base.slice(base.length - 80) : base;
+  return trimmed || `photo.${fallbackExt}`;
+}
+
+function resolveMime(asset: ImagePicker.ImagePickerAsset): AllowedMime {
+  const m = asset.mimeType?.toLowerCase();
+  if (m === 'image/jpeg' || m === 'image/png' || m === 'image/webp') return m;
+  const ext = (asset.fileName || asset.uri).toLowerCase().split('.').pop() ?? '';
+  if (ext === 'png') return 'image/png';
+  if (ext === 'webp') return 'image/webp';
+  return 'image/jpeg';
+}
+
+function extForMime(m: AllowedMime): string {
+  if (m === 'image/png') return 'png';
+  if (m === 'image/webp') return 'webp';
+  return 'jpg';
+}
 
 export default function PropertyPhotosRoute() {
   const { colors } = useTheme();
-  const [imgs, setImgs] = useState<string[]>(SAMPLE.slice(0, 3));
-  const valid = imgs.length >= 3;
+  const propertyPhotos = useCreateListing((s) => s.propertyPhotos);
+  const setVal = useCreateListing((s) => s.set);
+  const valid = propertyPhotos.length >= 3;
+  const requestUploadUrl = useRequestPhotoUploadUrl();
+  const toast = useToast();
+  const [uploading, setUploading] = useState(false);
 
   const removeAt = (i: number) => {
     haptic.light();
-    setImgs((p) => p.filter((_, idx) => idx !== i));
+    const next = propertyPhotos
+      .filter((_, idx) => idx !== i)
+      .map((p, idx) => ({ ...p, position: idx }));
+    setVal('propertyPhotos', next);
   };
 
-  const addOne = () => {
-    haptic.light();
-    setImgs((p) => [...p, SAMPLE[p.length % SAMPLE.length]!]);
-  };
+  async function addOne() {
+    if (uploading || propertyPhotos.length >= MAX_PHOTOS) return;
+    try {
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) {
+        toast.show('Autorise l’accès aux photos pour continuer', 'danger');
+        return;
+      }
+      const picked = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'images',
+        quality: 0.8,
+        allowsMultipleSelection: false,
+      });
+      if (picked.canceled || picked.assets.length === 0) return;
+
+      setUploading(true);
+      haptic.light();
+      const asset = picked.assets[0];
+      const contentType = resolveMime(asset);
+      const filename = sanitizeFilename(asset.fileName, extForMime(contentType));
+
+      const { upload_url, public_url, path } = await requestUploadUrl.mutateAsync({
+        kind: 'property',
+        filename,
+        content_type: contentType,
+      });
+
+      const fileRes = await fetch(asset.uri);
+      const blob = await fileRes.blob();
+      const putRes = await fetch(upload_url, {
+        method: 'PUT',
+        headers: { 'Content-Type': contentType, 'x-upsert': 'true' },
+        body: blob,
+      });
+      if (!putRes.ok) {
+        const raw = await putRes.text().catch(() => '');
+        console.error('[property-photos] storage PUT failed', putRes.status, raw);
+        toast.show('Téléversement échoué', 'danger');
+        return;
+      }
+
+      setVal('propertyPhotos', [
+        ...propertyPhotos,
+        { url: public_url, storage_path: path, position: propertyPhotos.length },
+      ]);
+    } catch (e: unknown) {
+      console.error('[property-photos] add error:', e);
+      toast.show(toToastMessage(e, 'Téléversement échoué'), 'danger');
+    } finally {
+      setUploading(false);
+    }
+  }
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -39,7 +121,7 @@ export default function PropertyPhotosRoute() {
         />
 
         {/* Cover slot */}
-        {imgs[0] && (
+        {propertyPhotos[0] && (
           <View style={{ paddingHorizontal: 24, marginBottom: 14 }}>
             <View
               style={{
@@ -50,7 +132,7 @@ export default function PropertyPhotosRoute() {
                 position: 'relative',
               }}
             >
-              <Image source={imgs[0]} style={{ flex: 1 }} contentFit="cover" />
+              <Image source={{ uri: propertyPhotos[0].url }} style={{ flex: 1 }} contentFit="cover" />
               <View
                 style={{
                   position: 'absolute',
@@ -108,7 +190,7 @@ export default function PropertyPhotosRoute() {
             gap: 10,
           }}
         >
-          {imgs.slice(1).map((src, i) => (
+          {propertyPhotos.slice(1).map((p, i) => (
             <View
               key={i}
               style={{
@@ -120,7 +202,7 @@ export default function PropertyPhotosRoute() {
                 position: 'relative',
               }}
             >
-              <Image source={src} style={{ flex: 1 }} contentFit="cover" />
+              <Image source={{ uri: p.url }} style={{ flex: 1 }} contentFit="cover" />
               <Pressable
                 onPress={() => removeAt(i + 1)}
                 style={{
@@ -143,6 +225,7 @@ export default function PropertyPhotosRoute() {
           {/* Add tile */}
           <Pressable
             onPress={addOne}
+            disabled={uploading || propertyPhotos.length >= MAX_PHOTOS}
             style={{
               width: '47%',
               aspectRatio: 1,
@@ -154,19 +237,26 @@ export default function PropertyPhotosRoute() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 8,
+              opacity: uploading ? 0.6 : 1,
             }}
           >
-            <Plus size={22} color={colors.text} strokeWidth={2} />
-            <Text
-              style={{
-                fontSize: 12,
-                fontWeight: '600',
-                color: colors.text,
-                letterSpacing: 0,
-              }}
-            >
-              Ajouter
-            </Text>
+            {uploading ? (
+              <ActivityIndicator size="small" color={colors.text} />
+            ) : (
+              <>
+                <Plus size={22} color={colors.text} strokeWidth={2} />
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: '600',
+                    color: colors.text,
+                    letterSpacing: 0,
+                  }}
+                >
+                  Ajouter
+                </Text>
+              </>
+            )}
           </Pressable>
         </View>
 
@@ -238,7 +328,7 @@ export default function PropertyPhotosRoute() {
               includeFontPadding: false,
             }}
           >
-            Continuer · {imgs.length} photo{imgs.length > 1 ? 's' : ''}
+            Continuer · {propertyPhotos.length} photo{propertyPhotos.length > 1 ? 's' : ''}
           </Text>
         </Pressable>
       </SafeAreaView>

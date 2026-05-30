@@ -13,28 +13,46 @@ import { useTheme } from '../../../src/theme/ThemeProvider';
 import { Text } from '../../../src/components/primitives/Text';
 import { ScreenHeader } from '../../../src/components/nav/ScreenHeader';
 import { haptic } from '../../../src/lib/haptics';
-import { mockProperties } from '../../../src/data/mockProperties';
+import { useProperty, useRequestVisit } from '../../../src/data/queries/properties';
 import { formatGNF } from '../../../src/lib/format';
+import { useToast } from '../../../src/components/feedback/Toast';
+import { toToastMessage } from '../../../src/lib/api';
 
 const DAYS = [
-  { id: 'today', label: 'Aujourd\'hui', date: '15 mai' },
-  { id: 'tomorrow', label: 'Demain', date: '16 mai' },
-  { id: 'd3', label: 'Vendredi', date: '17 mai' },
-  { id: 'd4', label: 'Samedi', date: '18 mai' },
+  { id: 'today',    label: 'Aujourd\'hui',  offset: 0 },
+  { id: 'tomorrow', label: 'Demain',        offset: 1 },
+  { id: 'd3',       label: 'Après-demain',  offset: 2 },
+  { id: 'd4',       label: '+3 jours',      offset: 3 },
 ];
 
 const SLOTS = ['09:00', '10:30', '14:00', '15:30', '17:00', '18:30'];
 
+function dateForOffset(offset: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d;
+}
+
+function formatDayLabel(d: Date): string {
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }).replace('.', '');
+}
+
 export default function VisitRequestRoute() {
   const { colors } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const property = mockProperties.find((p) => p.id === id) ?? mockProperties[0]!;
+  const { data: property } = useProperty(id);
+  const requestVisit = useRequestVisit();
+  const toast = useToast();
 
   const [dayId, setDayId] = useState('tomorrow');
   const [slot, setSlot] = useState<string | null>(null);
   const [note, setNote] = useState('');
 
-  const valid = !!slot;
+  const valid = !!slot && !!property;
+
+  if (!property) {
+    return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
+  }
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -160,7 +178,7 @@ export default function VisitRequestRoute() {
                       includeFontPadding: false,
                     }}
                   >
-                    {d.date}
+                    {formatDayLabel(dateForOffset(d.offset))}
                   </Text>
                 </Pressable>
               );
@@ -281,10 +299,26 @@ export default function VisitRequestRoute() {
         }}
       >
         <Pressable
-          disabled={!valid}
-          onPress={() => {
-            haptic.medium();
-            router.replace('/buyer/requests');
+          disabled={!valid || requestVisit.isPending}
+          onPress={async () => {
+            if (!valid || !property || !slot) return;
+            try {
+              haptic.medium();
+              const day = DAYS.find((d) => d.id === dayId)!;
+              const target = dateForOffset(day.offset);
+              const [h, m] = slot.split(':').map(Number);
+              target.setHours(h, m, 0, 0);
+              await requestVisit.mutateAsync({
+                property_id: property.id,
+                requested_at: target.toISOString(),
+                note: note.trim() || undefined,
+              });
+              toast.show('Demande envoyée 🎉', 'success');
+              router.replace('/buyer/requests');
+            } catch (e: unknown) {
+              console.error('[request-visit] error:', e);
+              toast.show(toToastMessage(e, 'Envoi impossible'), 'danger');
+            }
           }}
           style={{
             height: 56,
@@ -294,7 +328,7 @@ export default function VisitRequestRoute() {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 8,
-            opacity: valid ? 1 : 0.6,
+            opacity: !valid || requestVisit.isPending ? 0.6 : 1,
           }}
         >
           <CalendarDays
@@ -311,7 +345,7 @@ export default function VisitRequestRoute() {
               includeFontPadding: false,
             }}
           >
-            Envoyer la demande
+            {requestVisit.isPending ? 'Envoi…' : 'Envoyer la demande'}
           </Text>
         </Pressable>
       </SafeAreaView>

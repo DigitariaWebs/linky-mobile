@@ -159,7 +159,7 @@ export function useDeleteProduct() {
 // matching Content-Type, then puts public_url into the create-product photos[] array.
 export function useRequestPhotoUploadUrl() {
   return useMutation({
-    mutationFn: async (input: { filename: string; content_type: string }) => {
+    mutationFn: async (input: { kind: 'product' | 'property'; filename: string; content_type: string }) => {
       return apiPost<PhotoUploadUrl>({ path: '/photo-upload-url', body: input });
     },
   });

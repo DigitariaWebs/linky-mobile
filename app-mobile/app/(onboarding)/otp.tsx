@@ -106,7 +106,8 @@ export default function OtpRoute() {
   const requestOtp = useRequestOtp();
   const toast = useToast();
   const [code, setCode] = useState('');
-  const [seconds, setSeconds] = useState(42);
+  const [seconds, setSeconds] = useState(20);
+  const firedRef = useRef(false);
 
   useEffect(() => {
     if (seconds <= 0) return;
@@ -124,12 +125,13 @@ export default function OtpRoute() {
   }, [pendingDevCode, setPendingDevCode]);
 
   useEffect(() => {
-    if (code.length !== CODE_LENGTH || verifyOtp.isPending) return;
+    if (code.length !== CODE_LENGTH || verifyOtp.isPending || firedRef.current) return;
     if (!pendingOtpId) {
       toast.show('Session OTP introuvable — recommence', 'danger');
       router.replace(channel === 'email' ? '/(onboarding)/email' : '/(onboarding)/phone');
       return;
     }
+    firedRef.current = true;
     (async () => {
       try {
         const { access_token, refresh_token, user } = await verifyOtp.mutateAsync({
@@ -145,6 +147,7 @@ export default function OtpRoute() {
         console.error('[otp-verify] error:', e);
         toast.show(toToastMessage(e, 'Code invalide'), 'danger');
         setCode('');
+        firedRef.current = false; // allow retry after error
         haptic.warning();
       }
     })();
@@ -243,7 +246,7 @@ export default function OtpRoute() {
                     const { otp_id, dev_code } = await requestOtp.mutateAsync({ channel, target });
                     setPendingOtpId(otp_id);
                     setPendingDevCode(dev_code ?? null);
-                    setSeconds(60);
+                    setSeconds(20);
                     haptic.light();
                   } catch (e: unknown) {
                     console.error('[otp-resend] error:', e);

@@ -13,8 +13,8 @@ function valid(b: unknown): b is Body {
 }
 
 const OTP_TTL_SEC = 300;
-const PER_MINUTE = 1;
-const PER_DAY = 5;
+const PER_MINUTE = 3;
+const PER_DAY = 10;
 
 Deno.serve(makePost<Body>('/v1/otp/request', valid, async ({ sb, body }) => {
   const target = body.channel === 'phone' ? normalizePhone(body.target) : normalizeEmail(body.target);
@@ -55,17 +55,38 @@ Deno.serve(makePost<Body>('/v1/otp/request', valid, async ({ sb, body }) => {
     .single();
   if (e3 || !inserted) throwApi('INTERNAL_ERROR', 500, 'Erreur base de données');
 
-  // ⚠️ DEV-ONLY DELIVERY GATE — must never deliver via dev_code in production.
-  // LINKY_OTP_DELIVERY defaults to 'stub'. In stub mode we return the code to the
-  // client as `dev_code` (and log it) for BOTH phone and email, because no SMS/email
-  // provider is wired yet (Twilio deferred to production; email provider TBD).
-  // PRODUCTION MUST set LINKY_OTP_DELIVERY to a real provider value so this branch is
-  // skipped and dev_code is NEVER returned. A non-stub mode with no provider wired
-  // fails loudly rather than silently not delivering.
-  const delivery = Deno.env.get('LINKY_OTP_DELIVERY') ?? 'stub';
-  if (delivery !== 'stub') {
-    throwApi('CONFIG_MISSING', 500, "Service d'envoi du code indisponible. Réessaie plus tard.");
+  // Email delivery: when LANDING_OTP_URL + OTP_EMAIL_SECRET are set, POST the code to
+  // the landing's /api/send-otp transactional endpoint. Phone delivery + email without
+  // landing configured fall through to the dev_code stub (no SMS provider wired yet).
+  const landingUrl = Deno.env.get('LANDING_OTP_URL');
+  const emailSecret = Deno.env.get('OTP_EMAIL_SECRET');
+  const canDeliverEmail = !!landingUrl && !!emailSecret;
+
+  if (body.channel === 'email' && canDeliverEmail) {
+    try {
+      const r = await fetch(`${landingUrl}/api/send-otp`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-otp-secret': emailSecret,
+        },
+        body: JSON.stringify({ to: target, code }),
+      });
+      if (!r.ok) {
+        const detail = await r.text().catch(() => '');
+        console.error('[otp-request] email delivery failed:', r.status, detail);
+        throwApi('OTP_DELIVERY_FAILED', 502,
+          "Envoi du code par email impossible. Réessaie plus tard.");
+      }
+      return { body: { otp_id: inserted.id } }; // no dev_code in real delivery
+    } catch (e) {
+      console.error('[otp-request] email fetch threw:', e);
+      throwApi('OTP_DELIVERY_FAILED', 502,
+        "Envoi du code par email impossible. Réessaie plus tard.");
+    }
   }
+
+  // Stub fallback: phone channel + email without landing configured.
   console.log(`[OTP STUB] channel=${body.channel} target=${target} code=${code} otp_id=${inserted.id}`);
   return { body: { otp_id: inserted.id, dev_code: code } };
 }));
